@@ -145,24 +145,21 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	boolean gamepaused = true;
 	int PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
 
-	/* Entity variables. Every Entity, which includes asteroids, ships, stars, and projectiles,
-	 * will have these variables.
-	 */
+
+	public static ArrayList<Effect> EffectList  = new ArrayList<Effect>();
 	public static ArrayList<Particle> ParticleList  = new ArrayList<Particle>();
-	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();			
-
-
+	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();	
 
 
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
 		///*
-		for(int i = 0; i < 50; i++)
+		for(int i = 0; i < 40; i++)
 		{
 			for(int q = 0; q < 50;q++)
 			{
-				UsefulParticleMethods.CreateAsteroid(i*7, q*7, 10);
+				UsefulParticleMethods.CreateAsteroid(i*7, q*7, 1);
 			}
 		}
 		//*/
@@ -170,11 +167,21 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		//Particle thing = ParticleList.get(bob);
 		//thing.Xvel = -1;
 	}
-
-
+	long initialdate = 0;
+	long miliseconds = 0;
+	long gamemiliseconds = 0;
 	void functions()
 	{
 		GUI();
+		Date date = new Date();
+		
+		miliseconds = date.getTime()-initialdate;
+		initialdate = date.getTime();
+		gamemiliseconds = 50;
+
+		
+		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
+		
 		if(gamepaused == false)
 		{
 			for( int a = 0; a < 10; a++)//10 steps
@@ -185,9 +192,10 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 					UpdateEntity(i);//updates health
 					CheckCollision(i);		
 				}
+				DestroyParticles();//kills particles
 			}
 		}
-		DestroyParticles();//kills particles
+		
 		UpdatePriorities();// updates whether something is active or not.
 		repaint();//paints the scene
 	}
@@ -228,36 +236,40 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				updated.Host.tobedestroyed = true;
 			}
 
-			updated.EntityShield.CurrentHitpoints += updated.EntityShield.Regeneration;
-
-
-			if(updated.EntityShield.CurrentHitpoints > updated.EntityShield.MaxHitpoints)
+			if(updated.EntityShield != null)
 			{
-				updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
-			}
+				updated.EntityShield.CurrentHitpoints += updated.EntityShield.Regeneration;
 
-			if(updated.EntityShield.CurrentHitpoints < 0)
-			{
-				updated.EntityShield.Failed = true;
-				updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
-			}
 
-			if(updated.EntityShield.Failed == true)
-			{
-				updated.EntityShield.countdown--;
-				if(updated.EntityShield.countdown < 0)
+				if(updated.EntityShield.CurrentHitpoints > updated.EntityShield.MaxHitpoints)
 				{
-					updated.EntityShield.Failed = false;
-					updated.EntityShield.countdown = updated.EntityShield.SetupTime;
+					updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
+				}
+
+				if(updated.EntityShield.CurrentHitpoints < 0)
+				{
+					updated.EntityShield.Failed = true;
+					updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
+				}
+
+				if(updated.EntityShield.Failed == true)
+				{
+					updated.EntityShield.countdown--;
+					if(updated.EntityShield.countdown < 0)
+					{
+						updated.EntityShield.Failed = false;
+						updated.EntityShield.countdown = updated.EntityShield.SetupTime;
+					}
 				}
 			}
-
-			updated.EntityWeapon.CurrentReload += updated.EntityWeapon.Regeneration;
-			if(updated.EntityWeapon.CurrentReload > updated.EntityWeapon.MaxReload)
+			if(updated.EntityWeapon != null)
 			{
-				updated.EntityWeapon.CurrentReload = updated.EntityWeapon.MaxReload;
+				updated.EntityWeapon.CurrentReload += updated.EntityWeapon.Regeneration;
+				if(updated.EntityWeapon.CurrentReload > updated.EntityWeapon.MaxReload)
+				{
+					updated.EntityWeapon.CurrentReload = updated.EntityWeapon.MaxReload;
+				}
 			}
-
 
 			if(updated.Type == "player")
 			{
@@ -296,14 +308,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 		Particle updated = ParticleList.get(i);
 
-		
+
 		if(updated.active == true)
 		{
 			updated.countdown -=1;
 			updated.X += updated.Xvel;
 			updated.Y += updated.Yvel;
 		}
-		
+
 		if(updated.countdown < 0)
 		{
 			updated.tobedestroyed = true;
@@ -355,7 +367,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 						p1.Y+=p1.Yvel;
 						p2.X+=p2.Xvel;
 						p2.Y+=p2.Yvel;
-						
+
 
 					}
 				}
@@ -373,7 +385,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			}
 		}
 	}
-	
+
 	public void UpdatePriorities()
 	{
 		PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
@@ -422,20 +434,20 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		Color ColorBlack = new Color(10,10,10,255);
 		g2d.setPaint(ColorBlack);
 		g2d.fillRect(0, 0, 700, 700);
-		
 
 
-		//renders icons
+
+	//renders icons
 		for(int i = 0; i < ParticleList.size(); i++)
 		{
 
 			Particle displayed = ParticleList.get(i);
 			double screenx = displayed.X -screenCenteredX + 350;
 			double screeny = displayed.Y -screenCenteredY + 350;
-			
+
 			if(displayed.active == true && screenx < 700 && screenx > 0 && screeny < 700 && screeny > 0)
 			{
-				
+
 				double[] finalrotations = new double[displayed.Directions.length];
 				System.arraycopy(displayed.Directions, 0, finalrotations, 0, displayed.Directions.length);
 				for(int q = 0; q < finalrotations.length; q++)
@@ -455,8 +467,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				int[] yPoints = new int[finalrotations.length];
 				for(int q = 0; q < finalrotations.length; q++)
 				{
-				//	xPoints[q] = (int)Math.rint(displayed.X + xshift[q] - screenCenteredX + 350);
-				//	yPoints[q] = (int)Math.rint(displayed.Y + yshift[q] - screenCenteredY + 350);
+					//	xPoints[q] = (int)Math.rint(displayed.X + xshift[q] - screenCenteredX + 350);
+					//	yPoints[q] = (int)Math.rint(displayed.Y + yshift[q] - screenCenteredY + 350);
 					xPoints[q] = (int)(displayed.X + xshift[q] - screenCenteredX + 350);
 					yPoints[q] = (int)(displayed.Y + yshift[q] - screenCenteredY + 350);
 
@@ -466,7 +478,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				g2d.fillPolygon(xPoints, yPoints, xPoints.length);
 				g2d.setPaint(displayed.Outline);
 				g2d.drawPolygon(xPoints, yPoints, xPoints.length);	
-	/*
+				/*
 				g2d.setPaint(Color.white);
 				g2d.drawOval((int)(displayed.X-displayed.Radius)-screenCenteredX+350,
 						(int)(displayed.Y-displayed.Radius)-screenCenteredY+350,
