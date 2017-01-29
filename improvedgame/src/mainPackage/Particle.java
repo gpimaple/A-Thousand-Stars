@@ -35,6 +35,5 @@ public class Particle
 		Fill = fill;
 		Outline = outline;
 	}
-	double u = 0;
-	double t = 0;
+
 }

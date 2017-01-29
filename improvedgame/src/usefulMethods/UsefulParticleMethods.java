@@ -107,6 +107,43 @@ public class UsefulParticleMethods
 		return newEntity;
 	}
 
+	//collides two particles together elastically
+	public static void CollideParticles(int index1, int index2)
+	{
+		Particle p1 = Main.ParticleList.get(index1);
+		Particle p2 = Main.ParticleList.get(index2);
+		
+		Entity e1 = Main.EntityMap.get(p1);
+		Entity e2 = Main.EntityMap.get(p2);
+		UsefulParticleMethods.DamageEntity(index1,e2.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(index1,e1.EntityDamageSelfOnContact); //damage everybody
+		UsefulParticleMethods.DamageEntity(index2, e1.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(index2,e2.EntityDamageSelfOnContact);	
+		double colAng = UsefulParticleMethods.GetDirection(p1, p2);
+		double mag1 = Math.sqrt(p1.Xvel*p1.Xvel+p1.Yvel*p1.Yvel);
+		double mag2 = Math.sqrt(p2.Xvel*p2.Xvel+p2.Yvel*p2.Yvel);
+		double dir1 = Math.atan2(p1.Yvel, p1.Xvel);
+		double dir2 = Math.atan2(p2.Yvel, p2.Yvel);
+		double nXvel_1 = mag1*Math.cos(dir1-colAng);
+		double nYvel_1 = mag1*Math.sin(dir1-colAng);
+		double nXvel_2 = mag2*Math.cos(dir2-colAng);
+		double nYvel_2 = mag2*Math.sin(dir2-colAng);
+		double final_Xvel_1 = ((p1.Mass-p2.Mass)*nXvel_1+(p2.Mass+p2.Mass)*nXvel_2)/(p1.Mass+p2.Mass);
+		double final_Xvel_2 = ((p1.Mass+p1.Mass)*nXvel_1+(p2.Mass-p1.Mass)*nXvel_2)/(p1.Mass+p2.Mass);
+		double final_Yvel_1 = nYvel_1;
+		double final_Yvel_2 = nYvel_2;
+		p1.Xvel = Math.cos(colAng)*final_Xvel_1+Math.cos(colAng+Math.PI/2)*final_Yvel_1;
+		p1.Yvel = Math.sin(colAng)*final_Xvel_1+Math.sin(colAng+Math.PI/2)*final_Yvel_1;
+		p2.Xvel = Math.cos(colAng)*final_Xvel_2+Math.cos(colAng+Math.PI/2)*final_Yvel_2;
+		p2.Yvel = Math.sin(colAng)*final_Xvel_2+Math.sin(colAng+Math.PI/2)*final_Yvel_2;
+
+		p1.X+=p1.Xvel;
+		p1.Y+=p1.Yvel;
+		p2.X+=p2.Xvel;
+		p2.Y+=p2.Yvel;
+	}
+	
+	
 	public static void DestroyParticle(int i)
 	{
 		Main.EntityMap.remove(Main.ParticleList.get(i));
@@ -180,8 +217,8 @@ public class UsefulParticleMethods
 		int hostnumber = CreateParticle(x, y, rotation, mass, radius, directions, magnitudes, fill, outline);
 		Particle host = Main.ParticleList.get(hostnumber);
 		host.GravityMultiplier = 0;
-		host.Xvel = 0.0001*Math.random();
-		host.Yvel = 0.0001*Math.random();
+		//host.Xvel = 0.0001*Math.random();
+		//host.Yvel = 0.0001*Math.random();
 		String type = "asteroid";
 		String info = "A large rock that may contain valuable metals";
 		double damageoncontact = 1;
@@ -191,7 +228,10 @@ public class UsefulParticleMethods
 		return Main.ParticleList.size()-1;
 	}
 
-
+	
+	
+	
+	
 
 	public static void AddVelocity(int index, double theta, double force)
 	{
@@ -235,7 +275,8 @@ public class UsefulParticleMethods
 			return false;
 		}
 	}
-
+	
+	
 
 	public static int CreateElectronTorpedo(double x, double y, double xvel, double yvel)
 	{
@@ -259,9 +300,9 @@ public class UsefulParticleMethods
 		String info = "A common missile used mainly to harvest asteroids, but can also be used to kill.";
 		double maxhealth = 10;
 		double healthregen = -0.03;
-		double damageoncontact = 10;
+		double damageoncontact = 100000;
 		CreateEntity(host, type, info, maxhealth, healthregen, damageoncontact);
-		Main.EntityMap.get(host).EntityDamageSelfOnContact = -11;
+		Main.EntityMap.get(host).EntityDamageSelfOnContact = 11;
 		return hostnumber;
 	}
 
@@ -325,7 +366,7 @@ public class UsefulParticleMethods
 
 			double direction = Math.random()*Math.PI*2;
 			double newforce = force*(Math.random()*2);
-			host.countdown = (int)Math.sqrt(particles*(100*Math.random()));
+			host.countdown = (int)Math.sqrt(particles*(1000*Math.random()));
 			host.Priority = 1000000;
 			host.Xvel = startxvel + Math.cos(direction)*newforce;
 			host.Yvel = startyvel + Math.sin(direction)*newforce;

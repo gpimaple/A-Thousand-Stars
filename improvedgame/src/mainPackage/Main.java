@@ -3,14 +3,19 @@ package mainPackage;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Color;
 import java.awt.Font;
 
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import usefulMethods.UsefulParticleMethods;
+import usefulMethods.UsefulWorldGenMethods;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -143,23 +148,33 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static boolean rightkeydown = false;
 
 	boolean gamepaused = true;
+	
+	public static final int MapSize = 1000;
+	public static final int SectorSize = 64;
+	
+	
+	
+	
+	
+	
 	int PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
 
 
-	public static ArrayList<Effect> EffectList  = new ArrayList<Effect>();
+	public static Sector[][] SectorList = new Sector[MapSize][MapSize];
 	public static ArrayList<Particle> ParticleList  = new ArrayList<Particle>();
 	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();	
-
+	
 
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
+		
 		///*
-		for(int i = 0; i < 40; i++)
+		for(int i = 0; i < 9; i++)
 		{
-			for(int q = 0; q < 50;q++)
+			for(int q = 0; q < 9;q++)
 			{
-				UsefulParticleMethods.CreateAsteroid(i*7, q*7, 1);
+				UsefulParticleMethods.CreateAsteroid(1000+i*80, 1000+q*80, 500);
 			}
 		}
 		//*/
@@ -190,13 +205,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				{
 					UpdateParticle(i);//updates the particles, location, velocity, 
 					UpdateEntity(i);//updates health
+					UpdateSector(i);
 					CheckCollision(i);		
 				}
-				DestroyParticles();//kills particles
+				KillParticles();//kills particles
 			}
 		}
-		
 		UpdatePriorities();// updates whether something is active or not.
+		UsefulWorldGenMethods.ClearSectors();
 		repaint();//paints the scene
 	}
 
@@ -314,6 +330,22 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			updated.countdown -=1;
 			updated.X += updated.Xvel;
 			updated.Y += updated.Yvel;
+			if(updated.X < 0)
+			{
+				updated.X = 0;
+			}
+			if(updated.Y < 0)
+			{
+				updated.Y = 0;
+			}
+			if(updated.X > SectorSize*MapSize)
+			{
+				updated.X = SectorSize*MapSize;
+			}
+			if(updated.Y > SectorSize*MapSize)
+			{
+				updated.Y = SectorSize*MapSize;
+			}
 		}
 
 		if(updated.countdown < 0)
@@ -339,43 +371,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 					double distance = UsefulParticleMethods.GetDistance(p1, p2);
 					if(distance < r1 + r2)
 					{
-						Entity e1 = EntityMap.get(p1);
-						Entity e2 = EntityMap.get(p2);
-						UsefulParticleMethods.DamageEntity(i,e2.EntityDamageOnContact);
-						UsefulParticleMethods.DamageEntity(i,e1.EntityDamageSelfOnContact); //damage everybody
-						UsefulParticleMethods.DamageEntity(q, e1.EntityDamageOnContact);
-						UsefulParticleMethods.DamageEntity(q,e2.EntityDamageSelfOnContact);	
-						double colAng = UsefulParticleMethods.GetDirection(p1, p2);
-						double mag1 = Math.sqrt(p1.Xvel*p1.Xvel+p1.Yvel*p1.Yvel);
-						double mag2 = Math.sqrt(p2.Xvel*p2.Xvel+p2.Yvel*p2.Yvel);
-						double dir1 = Math.atan2(p1.Yvel, p1.Xvel);
-						double dir2 = Math.atan2(p2.Yvel, p2.Yvel);
-						double nXvel_1 = mag1*Math.cos(dir1-colAng);
-						double nYvel_1 = mag1*Math.sin(dir1-colAng);
-						double nXvel_2 = mag2*Math.cos(dir2-colAng);
-						double nYvel_2 = mag2*Math.sin(dir2-colAng);
-						double final_Xvel_1 = ((p1.Mass-p2.Mass)*nXvel_1+(p2.Mass+p2.Mass)*nXvel_2)/(p1.Mass+p2.Mass);
-						double final_Xvel_2 = ((p1.Mass+p1.Mass)*nXvel_1+(p2.Mass-p1.Mass)*nXvel_2)/(p1.Mass+p2.Mass);
-						double final_Yvel_1 = nYvel_1;
-						double final_Yvel_2 = nYvel_2;
-						p1.Xvel = Math.cos(colAng)*final_Xvel_1+Math.cos(colAng+Math.PI/2)*final_Yvel_1;
-						p1.Yvel = Math.sin(colAng)*final_Xvel_1+Math.sin(colAng+Math.PI/2)*final_Yvel_1;
-						p2.Xvel = Math.cos(colAng)*final_Xvel_2+Math.cos(colAng+Math.PI/2)*final_Yvel_2;
-						p2.Yvel = Math.sin(colAng)*final_Xvel_2+Math.sin(colAng+Math.PI/2)*final_Yvel_2;
-
-						p1.X+=p1.Xvel;
-						p1.Y+=p1.Yvel;
-						p2.X+=p2.Xvel;
-						p2.Y+=p2.Yvel;
-
-
+						UsefulParticleMethods.CollideParticles(i, q);
 					}
 				}
 			}
 		}
 	}
 
-	public void DestroyParticles()
+	public void KillParticles()
 	{
 		for(int i = ParticleList.size()-1; i >= 0 ; i--)//run it backward
 		{
@@ -385,7 +388,34 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			}
 		}
 	}
-
+	
+	
+	public void UpdateSector(int i)
+	{
+		Particle updated = ParticleList.get(i);
+		if(updated.active)
+		{
+			Entity updatedEntity = EntityMap.get(updated);
+			if(updatedEntity != null)
+			{
+				int sectorX = (int)(updated.X/SectorSize);
+				int sectorY = (int)(updated.Y/SectorSize);
+				
+				Sector sector = SectorList[sectorX][sectorY];
+				if(sector == null)
+				{
+					sector = new Sector(new Point(sectorX, sectorY));
+				}
+				if(!sector.particlesIn.contains(updated))
+				{
+					sector.particlesIn.add(updated);
+				}
+			}
+		}	
+	}
+	
+	
+	
 	public void UpdatePriorities()
 	{
 		PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
@@ -434,9 +464,16 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		Color ColorBlack = new Color(10,10,10,255);
 		g2d.setPaint(ColorBlack);
 		g2d.fillRect(0, 0, 700, 700);
-
-
-
+		
+		///*
+		g2d.setPaint(Color.WHITE);
+		for(int i = 0; i < 30; i++)
+		{
+			for(int q = 0; q < 30; q++)
+			{
+				g2d.drawRect(i*SectorSize+350-screenCenteredX, q*SectorSize+350-screenCenteredY, SectorSize, SectorSize);
+			}
+		}//*/
 	//renders icons
 		for(int i = 0; i < ParticleList.size(); i++)
 		{
@@ -467,10 +504,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				int[] yPoints = new int[finalrotations.length];
 				for(int q = 0; q < finalrotations.length; q++)
 				{
-					//	xPoints[q] = (int)Math.rint(displayed.X + xshift[q] - screenCenteredX + 350);
-					//	yPoints[q] = (int)Math.rint(displayed.Y + yshift[q] - screenCenteredY + 350);
-					xPoints[q] = (int)(displayed.X + xshift[q] - screenCenteredX + 350);
-					yPoints[q] = (int)(displayed.Y + yshift[q] - screenCenteredY + 350);
+					xPoints[q] = (int)Math.rint(xshift[q] + screenx);
+					yPoints[q] = (int)Math.rint(yshift[q] + screeny);
 
 				}
 

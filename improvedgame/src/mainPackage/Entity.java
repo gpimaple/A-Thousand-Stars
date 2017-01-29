@@ -30,4 +30,8 @@ public class Entity
 		HealthRegen = healthregen;
 		EntityDamageOnContact = entitydamageoncontact;
 	}
+
+
+
 }
+
