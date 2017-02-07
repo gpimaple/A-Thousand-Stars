@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 public class Sector {
-	ArrayList<Particle> particlesIn = new ArrayList<Particle>();
-	Point Location;
+	public ArrayList<Particle> particlesIn = new ArrayList<Particle>();
+	public Point Location;
 	public Sector(Point location)
 	{
 		Location = location;

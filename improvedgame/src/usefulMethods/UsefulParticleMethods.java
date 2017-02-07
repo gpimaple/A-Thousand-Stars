@@ -1,6 +1,7 @@
 package usefulMethods;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import mainPackage.*;
@@ -17,7 +18,7 @@ public class UsefulParticleMethods
 				return i;
 			}
 		}
-		System.out.println("Player is dead.");
+		//System.out.println("Player is dead.");
 		return -1;
 
 
@@ -34,6 +35,76 @@ public class UsefulParticleMethods
 		System.out.println("The player is dead");
 		return -1;*/
 	}
+
+	public static void CheckCollision()//Wikipedia is awesome. this is an elastic collision.
+	{
+		for(int i = 0; i < Main.ParticleList.size(); i++)
+		{
+			Particle p1 = Main.ParticleList.get(i);//first particle in collision
+			if(Main.EntityMap.get(p1) != null && p1.active == true)//check that it has an entity. Dont want to lag on checking nonentity
+			{
+				int sectorx = (int)(p1.X/Main.SectorSize);
+				int sectory = (int)(p1.Y/Main.SectorSize);
+
+				ArrayList<Particle> particlelist = new ArrayList<Particle>();
+
+
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory-1));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory+1));
+
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory-1));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory+1));
+
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory-1));
+				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory+1));
+
+				double r1 = p1.Radius;
+				for(int q = 0; q < particlelist.size(); q++)
+				{
+					Particle p2 = particlelist.get(q);
+					if( !p1.equals(p2) && Main.EntityMap.get(p2)!=null && p2.active == true)
+					{
+						double r2 = p2.Radius;
+						double distance = UsefulParticleMethods.GetDistance(p1, p2);
+						if(distance < r1 + r2)
+						{
+							UsefulParticleMethods.CollideParticles(p1, p2);
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+
+	public static ArrayList<Particle> GetSectorParticles(int x, int y)
+	{
+		ArrayList<Particle> particlelist = new ArrayList<Particle>();
+		try
+		{
+			Sector sector = Main.SectorList[x][y];
+			if(x >= 0 && y >= 0 && x < Main.MapSize && y < Main.MapSize  && sector != null)
+			{
+				particlelist.addAll(sector.particlesIn);
+			}
+			//	particlelist.get(0).Fill = new Color(0,255,0);
+		}
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			//	e.printStackTrace();
+		}
+		catch(java.lang.NullPointerException e)
+		{
+			//e.printStackTrace();
+		}
+		return particlelist;
+	}
+
 
 	//returns distance from 1 particle to another
 	public static double GetDistance(Particle i, Particle a)
@@ -108,17 +179,14 @@ public class UsefulParticleMethods
 	}
 
 	//collides two particles together elastically
-	public static void CollideParticles(int index1, int index2)
-	{
-		Particle p1 = Main.ParticleList.get(index1);
-		Particle p2 = Main.ParticleList.get(index2);
-		
+	public static void CollideParticles(Particle p1, Particle p2)
+	{	
 		Entity e1 = Main.EntityMap.get(p1);
 		Entity e2 = Main.EntityMap.get(p2);
-		UsefulParticleMethods.DamageEntity(index1,e2.EntityDamageOnContact);
-		UsefulParticleMethods.DamageEntity(index1,e1.EntityDamageSelfOnContact); //damage everybody
-		UsefulParticleMethods.DamageEntity(index2, e1.EntityDamageOnContact);
-		UsefulParticleMethods.DamageEntity(index2,e2.EntityDamageSelfOnContact);	
+		UsefulParticleMethods.DamageEntity(p1,e2.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(p1,e1.EntityDamageSelfOnContact); //damage everybody
+		UsefulParticleMethods.DamageEntity(p2, e1.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(p2,e2.EntityDamageSelfOnContact);	
 		double colAng = UsefulParticleMethods.GetDirection(p1, p2);
 		double mag1 = Math.sqrt(p1.Xvel*p1.Xvel+p1.Yvel*p1.Yvel);
 		double mag2 = Math.sqrt(p2.Xvel*p2.Xvel+p2.Yvel*p2.Yvel);
@@ -142,8 +210,8 @@ public class UsefulParticleMethods
 		p2.X+=p2.Xvel;
 		p2.Y+=p2.Yvel;
 	}
-	
-	
+
+
 	public static void DestroyParticle(int i)
 	{
 		Main.EntityMap.remove(Main.ParticleList.get(i));
@@ -183,8 +251,8 @@ public class UsefulParticleMethods
 		String type = "player";
 		String info = "You";
 		Shield shield = new Shield("ZetaCorp Defense Shield", 0.5, 600, 0.003, 9000);
-		Thruster thruster = new Thruster("Standard Galactic Rocketry Basic Thruster", 0.3);
-		Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 50, 1);
+		Thruster thruster = new Thruster("Standard Galactic Rocketry Basic Thruster", 0.5);
+		Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 30, 1);
 		double maxhealth = 500;
 		double healthregen = 0.001;
 		double damageoncontact = 10;
@@ -228,39 +296,29 @@ public class UsefulParticleMethods
 		return Main.ParticleList.size()-1;
 	}
 
-	
-	
-	
-	
 
-	public static void AddVelocity(int index, double theta, double force)
-	{
-		Particle particletoadd = Main.ParticleList.get(index);
-		particletoadd.Xvel += force*Math.cos(theta);
-		particletoadd.Yvel += force*Math.sin(theta);
-	}
 
-	public static void AddVector(int index, double theta, double force)
+
+
+	public static void AddVector(Particle particletoadd, double theta, double force)
 	{
-		Particle particletoadd = Main.ParticleList.get(index);
 		particletoadd.Xvel += (force*Math.cos(theta))/particletoadd.Mass;
 		particletoadd.Yvel += (force*Math.sin(theta))/particletoadd.Mass;
 	}
 
-	public static void MoveEntity(int index)
+	public static void MoveEntity(Particle updated)
 	{
-		Particle updated = Main.ParticleList.get(index);
 		Entity updatede = Main.EntityMap.get(updated);
 		if(updatede.EntityThruster != null)
 		{
 			double thrustforce = updatede.EntityThruster.Acceleration;
-			AddVector(index, updated.Rotation,thrustforce);
+			AddVector(updated, updated.Rotation,thrustforce);
 		}
 	}
 
-	public static void RotateParticle(int index, double newrotation)
+	public static void RotateParticle(Particle rotated, double newrotation)
 	{
-		Main.ParticleList.get(index).Rotation = newrotation;
+		rotated.Rotation = newrotation;
 	}
 
 	//checks if button has been clicked
@@ -275,8 +333,8 @@ public class UsefulParticleMethods
 			return false;
 		}
 	}
-	
-	
+
+
 
 	public static int CreateElectronTorpedo(double x, double y, double xvel, double yvel)
 	{
@@ -308,9 +366,8 @@ public class UsefulParticleMethods
 
 
 
-	public static void ShootEntity(int i)
+	public static void ShootEntity(Particle shooter)
 	{
-		Particle shooter = Main.ParticleList.get(i);
 		Entity shooterEntity = Main.EntityMap.get(shooter);
 		if(shooterEntity.EntityWeapon != null && shooterEntity.EntityWeapon.CurrentReload >= shooterEntity.EntityWeapon.MaxReload)
 		{
@@ -332,9 +389,9 @@ public class UsefulParticleMethods
 		}
 	}
 
-	public static void DamageEntity(int i, double damage)
+	public static void DamageEntity(Particle damaged, double damage)
 	{
-		Entity tobedamaged = Main.EntityMap.get(Main.ParticleList.get(i));
+		Entity tobedamaged = Main.EntityMap.get(damaged);
 		if(tobedamaged.EntityShield != null && tobedamaged.EntityShield.Failed == false)
 		{
 			tobedamaged.EntityShield.CurrentHitpoints -= damage;
@@ -356,7 +413,7 @@ public class UsefulParticleMethods
 			double mass = 0.001;
 			double radius = -100;
 			double[] xs = new double[] {Math.random()*1, -Math.random()*2};
-			double[] ys = new double[] {0, 0};
+			double[] ys = new double[] {Math.random()*0, -Math.random()*0};
 			double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 			double[] directions = GetDirectionsForParticle(xs,ys);
 			Color fillcolor = new Color(200,200,200,255);

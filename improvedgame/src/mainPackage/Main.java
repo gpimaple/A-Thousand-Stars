@@ -162,23 +162,26 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	public static Sector[][] SectorList = new Sector[MapSize][MapSize];
 	public static ArrayList<Particle> ParticleList  = new ArrayList<Particle>();
-	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();	
+	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();
 	
 
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
 		
-		///*
-		for(int i = 0; i < 9; i++)
+		/*
+		for(int i = 0; i < 100; i++)
 		{
-			for(int q = 0; q < 9;q++)
+			for(int q = 0; q < 100;q++)
 			{
-				UsefulParticleMethods.CreateAsteroid(1000+i*80, 1000+q*80, 500);
+				if( i%8 < 4 && q%8 < 4)
+				{
+					UsefulParticleMethods.CreateAsteroid(100+i*8, 100+q*8, 5);
+				}
 			}
 		}
 		//*/
-		//int bob = UsefulParticleMethods.CreateAsteroid(100,100, 1000);
+		int bob = UsefulParticleMethods.CreateAsteroid(100,100, 5000);
 		//Particle thing = ParticleList.get(bob);
 		//thing.Xvel = -1;
 	}
@@ -192,28 +195,28 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		
 		miliseconds = date.getTime()-initialdate;
 		initialdate = date.getTime();
-		gamemiliseconds = 50;
+		gamemiliseconds = 100;
 
 		
 		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
 		if(gamepaused == false)
 		{
-			for( int a = 0; a < 10; a++)//10 steps
+			for(int a = 0; a < 10; a++)//10 steps
 			{
 				for(int i = ParticleList.size()-1; i >= 0 ; i--)//run it backward
 				{
 					UpdateParticle(i);//updates the particles, location, velocity, 
 					UpdateEntity(i);//updates health
-					UpdateSector(i);
-					CheckCollision(i);		
+					
 				}
+				UsefulWorldGenMethods.ResetSectors();
+				UsefulParticleMethods.CheckCollision();		
 				KillParticles();//kills particles
-			}
+				UpdatePriorities();// updates whether something is active or not.	
+			}	
+			repaint();//paints the scene
 		}
-		UpdatePriorities();// updates whether something is active or not.
-		UsefulWorldGenMethods.ClearSectors();
-		repaint();//paints the scene
 	}
 
 
@@ -238,7 +241,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	void UpdateEntity(int i)
 	{
-		Entity updated = EntityMap.get(ParticleList.get(i));
+		Particle particle = ParticleList.get(i);
+		Entity updated = EntityMap.get(particle);
 		if(updated != null && updated.Host.active == true)
 		{
 			updated.Host.countdown += 1;
@@ -307,11 +311,11 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				}
 				if(upkeydown == true)
 				{
-					UsefulParticleMethods.MoveEntity(i);
+					UsefulParticleMethods.MoveEntity(particle);
 				}
 				if(spacekeydown == true)
 				{
-					UsefulParticleMethods.ShootEntity(i);
+					UsefulParticleMethods.ShootEntity(particle);
 				}
 			}
 
@@ -355,29 +359,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	}
 
 
-
-	public void CheckCollision(int i)//Wikipedia is awesome. this is an elastic collision.
-	{
-		Particle p1 = ParticleList.get(i);//first particle in collision
-		if(EntityMap.get(p1) != null && p1.active == true)//check that it has an entity. Dont want to lag on checking nonentity
-		{
-			double r1 = p1.Radius;
-			for(int q = 0; q < ParticleList.size(); q++)
-			{
-				if(i != q && EntityMap.get(ParticleList.get(q))!=null && ParticleList.get(q).active == true)
-				{
-					Particle p2 = ParticleList.get(q);
-					double r2 = p2.Radius;
-					double distance = UsefulParticleMethods.GetDistance(p1, p2);
-					if(distance < r1 + r2)
-					{
-						UsefulParticleMethods.CollideParticles(i, q);
-					}
-				}
-			}
-		}
-	}
-
 	public void KillParticles()
 	{
 		for(int i = ParticleList.size()-1; i >= 0 ; i--)//run it backward
@@ -389,30 +370,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		}
 	}
 	
-	
-	public void UpdateSector(int i)
-	{
-		Particle updated = ParticleList.get(i);
-		if(updated.active)
-		{
-			Entity updatedEntity = EntityMap.get(updated);
-			if(updatedEntity != null)
-			{
-				int sectorX = (int)(updated.X/SectorSize);
-				int sectorY = (int)(updated.Y/SectorSize);
-				
-				Sector sector = SectorList[sectorX][sectorY];
-				if(sector == null)
-				{
-					sector = new Sector(new Point(sectorX, sectorY));
-				}
-				if(!sector.particlesIn.contains(updated))
-				{
-					sector.particlesIn.add(updated);
-				}
-			}
-		}	
-	}
 	
 	
 	
@@ -580,7 +537,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		while (true) 
 		{
 			game.functions();
-			Thread.sleep(50);		
+			Thread.sleep(100);		
 		}
 	}
 }
