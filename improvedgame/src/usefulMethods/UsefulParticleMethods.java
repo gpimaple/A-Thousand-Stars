@@ -1,9 +1,13 @@
 package usefulMethods;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.sound.sampled.AudioInputStream;
+
 import mainPackage.*;
 
 public class UsefulParticleMethods 
@@ -48,19 +52,25 @@ public class UsefulParticleMethods
 
 				ArrayList<Particle> particlelist = new ArrayList<Particle>();
 
-
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory-1));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx, sectory+1));
-
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory-1));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx-1, sectory+1));
-
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory-1));
-				particlelist.addAll(UsefulParticleMethods.GetSectorParticles(sectorx+1, sectory+1));
-
+				double xmin = p1.X - p1.Radius;
+				double xmax = p1.X + p1.Radius;
+				
+				double ymin = p1.Y - p1.Radius;
+				double ymax = p1.Y + p1.Radius;
+				
+				int xminsector = (int)(xmin/Main.SectorSize);
+				int yminsector = (int)(ymin/Main.SectorSize);
+				int xmaxsector = (int)(xmax/Main.SectorSize);
+				int ymaxsector = (int)(ymax/Main.SectorSize);
+				
+				
+				for(int x = xminsector; x <= xmaxsector; x++)//iterate through all the sectors it is in
+				{
+					for(int y = yminsector; y <= ymaxsector; y++)
+					{
+						particlelist.addAll(UsefulParticleMethods.GetSectorParticles(x, y));
+					}
+				}
 				double r1 = p1.Radius;
 				for(int q = 0; q < particlelist.size(); q++)
 				{
@@ -205,10 +215,10 @@ public class UsefulParticleMethods
 		p2.Xvel = Math.cos(colAng)*final_Xvel_2+Math.cos(colAng+Math.PI/2)*final_Yvel_2;
 		p2.Yvel = Math.sin(colAng)*final_Xvel_2+Math.sin(colAng+Math.PI/2)*final_Yvel_2;
 
-		p1.X+=p1.Xvel;
-		p1.Y+=p1.Yvel;
-		p2.X+=p2.Xvel;
-		p2.Y+=p2.Yvel;
+		p1.X+=1*p1.Xvel;
+		p1.Y+=1*p1.Yvel;
+		p2.X+=1*p2.Xvel;
+		p2.Y+=1*p2.Yvel;
 	}
 
 
@@ -277,6 +287,10 @@ public class UsefulParticleMethods
 		for(int i = 0; i < 6; i++)
 		{
 			magnitudes[i]= radius/2 + Math.random()*radius;
+			if(magnitudes[i] < 1)
+			{
+				magnitudes[i] = 1;
+			}
 			directions[i] += (Math.random()-0.5)/2;
 		}
 		Color fill = new Color(100,100,100,255); //white

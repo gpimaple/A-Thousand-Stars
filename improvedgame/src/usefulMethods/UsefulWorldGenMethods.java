@@ -21,19 +21,34 @@ public class UsefulWorldGenMethods {
 				Entity updatedEntity = Main.EntityMap.get(updated);
 				if(updatedEntity != null)
 				{
-					int sectorX = (int)(updated.X/Main.SectorSize);
-					int sectorY = (int)(updated.Y/Main.SectorSize);
+					double xmin = updated.X - updated.Radius;
+					double xmax = updated.X + updated.Radius;
 					
-					Sector sector = Main.SectorList[sectorX][sectorY];
-					if(sector == null)
+					double ymin = updated.Y - updated.Radius;
+					double ymax = updated.Y + updated.Radius;
+					
+					int xminsector = (int)(xmin/Main.SectorSize);
+					int yminsector = (int)(ymin/Main.SectorSize);
+					int xmaxsector = (int)(xmax/Main.SectorSize);
+					int ymaxsector = (int)(ymax/Main.SectorSize);
+					
+					
+					for(int x = xminsector; x <= xmaxsector; x++)//iterate through all the sectors it is in
 					{
-						sector = new Sector(new Point(sectorX, sectorY));
+						for(int y = yminsector; y <= ymaxsector; y++)
+						{
+							Sector sector = Main.SectorList[x][y];
+							if(sector == null)//if the sector does not yet exist, add it
+							{
+								sector = new Sector(new Point(x, y));
+							}
+							if(!sector.particlesIn.contains(updated))//if the sector does not already hold it, add it
+							{
+								sector.particlesIn.add(updated);
+							}
+							Main.SectorList[x][y] = sector;
+						}
 					}
-					if(!sector.particlesIn.contains(updated))
-					{
-						sector.particlesIn.add(updated);
-					}
-					Main.SectorList[sectorX][sectorY] = sector;
 				}
 			}	
 		}

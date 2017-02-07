@@ -169,14 +169,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
 		
-		/*
+		///*
 		for(int i = 0; i < 100; i++)
 		{
 			for(int q = 0; q < 100;q++)
 			{
-				if( i%8 < 4 && q%8 < 4)
+				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(100+i*8, 100+q*8, 5);
+					UsefulParticleMethods.CreateAsteroid(100+i*8, 100+q*8, 1);
 				}
 			}
 		}
@@ -388,14 +388,15 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 					double distance = UsefulParticleMethods.GetDistance(updated, PlayerParticle);//gets distance
 					if(updated.active == true)
 					{
-						if(distance > updated.Priority)//if it is too far
+						if(distance > updated.Priority*3)//if it is too far
 						{
+							if(Math.sqrt(updated.Xvel*updated.Xvel + updated.Yvel*updated.Yvel) < 0.2)
 							updated.active = false;
 						}
 					}
 					else
 					{
-						if(distance < updated.Priority/2)//if it is close enough that it will run
+						if(distance < updated.Priority/1.1)//if it is close enough that it will run
 						{
 							updated.active = true;
 						}
@@ -461,8 +462,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				int[] yPoints = new int[finalrotations.length];
 				for(int q = 0; q < finalrotations.length; q++)
 				{
-					xPoints[q] = (int)Math.rint(xshift[q] + screenx);
-					yPoints[q] = (int)Math.rint(yshift[q] + screeny);
+					xPoints[q] = (int)Math.rint(xshift[q]/1 + screenx/1);
+					yPoints[q] = (int)Math.rint(yshift[q]/1 + screeny/1);
 
 				}
 
