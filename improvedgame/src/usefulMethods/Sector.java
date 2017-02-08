@@ -1,7 +1,9 @@
-package mainPackage;
+package usefulMethods;
 
 import java.awt.Point;
 import java.util.ArrayList;
+
+import mainPackage.Particle;
 
 public class Sector {
 	public ArrayList<Particle> particlesIn = new ArrayList<Particle>();

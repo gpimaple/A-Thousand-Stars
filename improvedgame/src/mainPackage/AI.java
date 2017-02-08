@@ -5,7 +5,7 @@ public class AI {
 	String ProvokableTags = null;//these tags describe what provokes the AI [Damaged] [Recieved_Distress_Call] []  
 	String AttackTags = null;//
 	String DeathTags = null; // [Distress_Call] []
-	String OtherTags = null;//[Override_Gravity] [Override_]
+	String OtherTags = null;
 	public AI(String neutraltags, String provokabletags, String attacktags, String deathtags, String othertags)
 	{
 		

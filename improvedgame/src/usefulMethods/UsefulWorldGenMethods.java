@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import mainPackage.Entity;
 import mainPackage.Main;
 import mainPackage.Particle;
-import mainPackage.Sector;
 
 public class UsefulWorldGenMethods {
 	

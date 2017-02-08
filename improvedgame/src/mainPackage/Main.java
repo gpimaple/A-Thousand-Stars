@@ -14,6 +14,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import usefulMethods.Sector;
 import usefulMethods.UsefulParticleMethods;
 import usefulMethods.UsefulSoundImageMethods;
 import usefulMethods.UsefulWorldGenMethods;
@@ -164,12 +165,13 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static Sector[][] SectorList = new Sector[MapSize][MapSize];
 	public static ArrayList<Particle> ParticleList  = new ArrayList<Particle>();
 	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();
-	
+	public static HashMap<Entity, AI> AIMap = new HashMap<Entity, AI>();
+
 
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
-		
+		UsefulSoundImageMethods.PlayBackgroundMusic("test.wav");
 		///*
 		for(int i = 0; i < 100; i++)
 		{
@@ -317,7 +319,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				if(spacekeydown == true)
 				{
 					UsefulParticleMethods.ShootEntity(particle);
-					UsefulSoundImageMethods.PlaySound("text.wav");
+					UsefulSoundImageMethods.PlaySound("test.wav");
 				}
 			}
 
