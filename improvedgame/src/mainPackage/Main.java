@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import usefulMethods.UsefulParticleMethods;
+import usefulMethods.UsefulSoundImageMethods;
 import usefulMethods.UsefulWorldGenMethods;
 
 import java.util.ArrayList;
@@ -188,7 +189,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	long initialdate = 0;
 	long miliseconds = 0;
 	long gamemiliseconds = 0;
-	void functions()
+	void gameloop() throws InterruptedException
 	{
 		GUI();
 		Date date = new Date();
@@ -196,7 +197,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		miliseconds = date.getTime()-initialdate;
 		initialdate = date.getTime();
 		gamemiliseconds = 100;
-
+		Thread.sleep(100);
 		
 		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
@@ -316,6 +317,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				if(spacekeydown == true)
 				{
 					UsefulParticleMethods.ShootEntity(particle);
+					UsefulSoundImageMethods.PlaySound("text.wav");
 				}
 			}
 
@@ -526,7 +528,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	}
 
-	public static void main(String[] args) throws InterruptedException 
+	public static void main(String[] args)
 	{
 		JFrame frame = new JFrame("A Thousand Stars");
 		Main game = new Main(frame);
@@ -537,8 +539,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		game.initialize();
 		while (true) 
 		{
-			game.functions();
-			Thread.sleep(100);		
+			try
+			{
+				game.gameloop();		
+			}
+			catch(InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }

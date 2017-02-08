@@ -1,5 +1,6 @@
 package usefulMethods;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -10,16 +11,13 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class UsefulSoundImageMethods {
-	public static void PlaySound(String filelocation)
+	public static void PlaySound(String filename)
 	{
 		 try {
-	         // Open an audio input stream.
-	         
-			 URL url = new URL(filelocation);
-	         AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+			 File thing = new File("Resources\\Sound\\"+filename);
+	         AudioInputStream audioIn = AudioSystem.getAudioInputStream(thing);
 	         // Get a sound clip resource.
 	         Clip clip = AudioSystem.getClip();
-	         // Open audio clip and load samples from the audio input stream.
 	         clip.open(audioIn);
 	         clip.start();
 	      } catch (UnsupportedAudioFileException e) {
