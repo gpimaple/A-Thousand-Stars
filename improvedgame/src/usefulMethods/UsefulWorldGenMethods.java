@@ -8,7 +8,7 @@ import mainPackage.Main;
 import mainPackage.Particle;
 
 public class UsefulWorldGenMethods {
-	
+
 	public static void ResetSectors()
 	{
 		Main.SectorList = new Sector[Main.MapSize][Main.MapSize];
@@ -22,37 +22,41 @@ public class UsefulWorldGenMethods {
 				{
 					double xmin = updated.X - updated.Radius;
 					double xmax = updated.X + updated.Radius;
-					
+
 					double ymin = updated.Y - updated.Radius;
 					double ymax = updated.Y + updated.Radius;
-					
+
 					int xminsector = (int)(xmin/Main.SectorSize);
 					int yminsector = (int)(ymin/Main.SectorSize);
 					int xmaxsector = (int)(xmax/Main.SectorSize);
 					int ymaxsector = (int)(ymax/Main.SectorSize);
-					
-					
+
+
 					for(int x = xminsector; x <= xmaxsector; x++)//iterate through all the sectors it is in
 					{
 						for(int y = yminsector; y <= ymaxsector; y++)
 						{
-							Sector sector = Main.SectorList[x][y];
-							if(sector == null)//if the sector does not yet exist, add it
+							if(xminsector > -1 && yminsector > -1 &&
+									xmaxsector < Main.MapSize && ymaxsector < Main.MapSize)
 							{
-								sector = new Sector(new Point(x, y));
+								Sector sector = Main.SectorList[x][y];
+								if(sector == null)//if the sector does not yet exist, add it
+								{
+									sector = new Sector(new Point(x, y));
+								}
+								if(!sector.particlesIn.contains(updated))//if the sector does not already hold it, add it
+								{
+									sector.particlesIn.add(updated);
+								}
+								Main.SectorList[x][y] = sector;
 							}
-							if(!sector.particlesIn.contains(updated))//if the sector does not already hold it, add it
-							{
-								sector.particlesIn.add(updated);
-							}
-							Main.SectorList[x][y] = sector;
 						}
 					}
 				}
 			}	
 		}
 	}
-	
+
 	public static void InitializeSectors()
 	{
 		int mapsize = Main.MapSize;
@@ -65,7 +69,7 @@ public class UsefulWorldGenMethods {
 				list[x][y] = new Sector(location);
 			}
 		}
-		
+
 		Main.SectorList = list;
 	}
 }

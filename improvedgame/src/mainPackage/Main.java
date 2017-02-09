@@ -151,7 +151,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	boolean gamepaused = true;
 	
-	public static final int MapSize = 1000;
+	public static final int MapSize = 30;
 	public static final int SectorSize = 64;
 	
 	
@@ -171,15 +171,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(-100,100);
-		UsefulSoundImageMethods.PlayBackgroundMusic("test.wav");
 		///*
-		for(int i = 0; i < 100; i++)
+		for(int i = 0; i < 50; i++)
 		{
-			for(int q = 0; q < 100;q++)
+			for(int q = 0; q < 50;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(100+i*8, 100+q*8, 1);
+					UsefulParticleMethods.CreateAsteroid(200+i*5, 200+q*5, 5);
 				}
 			}
 		}
@@ -198,8 +197,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		
 		miliseconds = date.getTime()-initialdate;
 		initialdate = date.getTime();
-		gamemiliseconds = 100;
-		Thread.sleep(100);
+		gamemiliseconds = 50;
+		Thread.sleep(50);
 		
 		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
@@ -211,15 +210,14 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				{
 					UpdateParticle(i);//updates the particles, location, velocity, 
 					UpdateEntity(i);//updates health
-					
 				}
 				UsefulWorldGenMethods.ResetSectors();
 				UsefulParticleMethods.CheckCollision();		
 				KillParticles();//kills particles
 				UpdatePriorities();// updates whether something is active or not.	
 			}	
-			repaint();//paints the scene
 		}
+		repaint();//paints the scene
 	}
 
 
@@ -319,7 +317,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				if(spacekeydown == true)
 				{
 					UsefulParticleMethods.ShootEntity(particle);
-					UsefulSoundImageMethods.PlaySound("test.wav");
 				}
 			}
 
@@ -341,18 +338,22 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			if(updated.X < 0)
 			{
 				updated.X = 0;
+				updated.Xvel = -updated.Xvel;
 			}
 			if(updated.Y < 0)
 			{
 				updated.Y = 0;
+				updated.Yvel = -updated.Yvel;
 			}
 			if(updated.X > SectorSize*MapSize)
 			{
 				updated.X = SectorSize*MapSize;
+				updated.Xvel = -updated.Xvel;
 			}
 			if(updated.Y > SectorSize*MapSize)
 			{
 				updated.Y = SectorSize*MapSize;
+				updated.Yvel = -updated.Yvel;
 			}
 		}
 
@@ -444,7 +445,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			double screenx = displayed.X -screenCenteredX + 350;
 			double screeny = displayed.Y -screenCenteredY + 350;
 
-			if(displayed.active == true && screenx < 700 && screenx > 0 && screeny < 700 && screeny > 0)
+			if(displayed.active == true && screenx < 750 && screenx > -50 && screeny < 750 && screeny > -50)
 			{
 
 				double[] finalrotations = new double[displayed.Directions.length];
@@ -475,10 +476,10 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				g2d.fillPolygon(xPoints, yPoints, xPoints.length);
 				g2d.setPaint(displayed.Outline);
 				g2d.drawPolygon(xPoints, yPoints, xPoints.length);	
-				/*
+				///*
 				g2d.setPaint(Color.white);
-				g2d.drawOval((int)(displayed.X-displayed.Radius)-screenCenteredX+350,
-						(int)(displayed.Y-displayed.Radius)-screenCenteredY+350,
+				g2d.drawOval((int)(-displayed.Radius + screenx),
+						(int)(-displayed.Radius + screeny),
 						(int)displayed.Radius*2, (int)displayed.Radius*2);//*/
 			}
 

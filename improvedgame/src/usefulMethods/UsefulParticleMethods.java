@@ -215,10 +215,18 @@ public class UsefulParticleMethods
 		p2.Xvel = Math.cos(colAng)*final_Xvel_2+Math.cos(colAng+Math.PI/2)*final_Yvel_2;
 		p2.Yvel = Math.sin(colAng)*final_Xvel_2+Math.sin(colAng+Math.PI/2)*final_Yvel_2;
 
-		p1.X+=1*p1.Xvel;
-		p1.Y+=1*p1.Yvel;
-		p2.X+=1*p2.Xvel;
-		p2.Y+=1*p2.Yvel;
+
+		double direction = GetDirection(p2, p1);
+		
+		p1.X += 1*Math.cos(direction);
+		p1.Y += 1*Math.sin(direction);
+		
+		direction = GetDirection(p1, p2);
+		
+		p2.X += 1*Math.cos(direction);
+		p2.Y += 1*Math.sin(direction);
+		
+		
 	}
 
 
@@ -262,7 +270,8 @@ public class UsefulParticleMethods
 		String info = "You";
 		Shield shield = new Shield("ZetaCorp Defense Shield", 0.5, 600, 0.003, 9000);
 		Thruster thruster = new Thruster("Standard Galactic Rocketry Basic Thruster", 0.5);
-		Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 30, 1);
+		Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 50, 1);
+		//Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.9, 500, 5, 1, 1);
 		double maxhealth = 500;
 		double healthregen = 0.001;
 		double damageoncontact = 10;
@@ -357,8 +366,11 @@ public class UsefulParticleMethods
 		double rotation = Math.atan2(yvel, xvel);
 		double mass = 2;
 		double radius = 0.5;
-		double[] xs = new double[] {-1, 0};
-		double[] ys = new double[] { 0, 0};
+		//double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
+		//double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
+		double[] xs = new double[] {1,0};
+		double[] ys = new double[] {0,0};		
+		
 		double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 		double[] directions = GetDirectionsForParticle(xs,ys);
 		Color fillcolor = new Color(255,255,255,255);
@@ -372,7 +384,7 @@ public class UsefulParticleMethods
 		String info = "A common missile used mainly to harvest asteroids, but can also be used to kill.";
 		double maxhealth = 10;
 		double healthregen = -0.03;
-		double damageoncontact = 100000;
+		double damageoncontact = 10;
 		CreateEntity(host, type, info, maxhealth, healthregen, damageoncontact);
 		Main.EntityMap.get(host).EntityDamageSelfOnContact = 11;
 		return hostnumber;
@@ -387,7 +399,7 @@ public class UsefulParticleMethods
 		{
 			for(int q = 0; q < shooterEntity.EntityWeapon.NumberAtOnce; q++)
 			{
-				double rotation = shooter.Rotation + (Math.random()-1) * shooterEntity.EntityWeapon.Spread;
+				double rotation = shooter.Rotation + (Math.random()-0.5) * shooterEntity.EntityWeapon.Spread;
 				double setback = shooter.Radius + 2;
 				double x = shooter.X + Math.cos(rotation)*setback*2;
 				double y = shooter.Y + Math.sin(rotation)*setback*2;
@@ -428,9 +440,13 @@ public class UsefulParticleMethods
 			double radius = -100;
 			double[] xs = new double[] {Math.random()*1, -Math.random()*2};
 			double[] ys = new double[] {Math.random()*0, -Math.random()*0};
+			
+			//xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
+			//ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
+			
 			double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 			double[] directions = GetDirectionsForParticle(xs,ys);
-			Color fillcolor = new Color(200,200,200,255);
+			Color fillcolor = new Color(200,200,200,100);
 			Color outlinecolor  = new Color(200, 200, 200, 30);
 			int hostnumber = CreateParticle(x,y, rotation, mass, radius, directions, magnitudes, fillcolor, outlinecolor);
 			Particle host = Main.ParticleList.get(hostnumber);
