@@ -134,9 +134,9 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	}
 
-	String gameoutcome = "";
-	int screenCenteredX = 0;
-	int screenCenteredY = 0;
+	public static String currentScreen = "title";
+	public static int screenCenteredX = 0;
+	public static int screenCenteredY = 0;
 
 	public static double mousex = 0;
 	public static double mousey = 0;
@@ -149,7 +149,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static boolean leftkeydown = false;
 	public static boolean rightkeydown = false;
 
-	boolean gamepaused = true;
+	public static boolean gameActive = false;
 	
 	public static final int MapSize = 30;
 	public static final int SectorSize = 64;
@@ -170,15 +170,15 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	void initialize()
 	{
-		UsefulParticleMethods.CreatePlayer(-100,100);
+		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 50; i++)
+		for(int i = 0; i < 30; i++)
 		{
-			for(int q = 0; q < 50;q++)
+			for(int q = 0; q < 30;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(200+i*5, 200+q*5, 5);
+					UsefulParticleMethods.CreateAsteroid(200+i*6.4, 200+q*6.4, 10);
 				}
 			}
 		}
@@ -192,7 +192,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	long gamemiliseconds = 0;
 	void gameloop() throws InterruptedException
 	{
-		GUI();
 		Date date = new Date();
 		
 		miliseconds = date.getTime()-initialdate;
@@ -202,7 +201,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		
 		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
-		if(gamepaused == false)
+		if(gameActive == true)
 		{
 			for(int a = 0; a < 10; a++)//10 steps
 			{
@@ -217,7 +216,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				UpdatePriorities();// updates whether something is active or not.	
 			}	
 		}
-		repaint();//paints the scene
+		repaint();//paints the scene, and lets you can click on stuff
+		
 	}
 
 
@@ -234,7 +234,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		{
 			if(UsefulParticleMethods.IsButtonClicked(710, 20,80,20))
 			{
-				gamepaused = !gamepaused;
+				gameActive = !gameActive;
 			}
 			mouseclickedrecently = false;
 		}
@@ -414,7 +414,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 
 
-
+	public static Color ColorBlack = new Color(10,10,10,255); 
 	@Override
 	public void paint(Graphics g) 
 	{
@@ -424,111 +424,18 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
 		setBackground(Color.gray);
-		Color ColorBlack = new Color(10,10,10,255);
 		g2d.setPaint(ColorBlack);
 		g2d.fillRect(0, 0, 700, 700);
 		
-		///*
-		g2d.setPaint(Color.WHITE);
-		for(int i = 0; i < 30; i++)
+		if(currentScreen == "game")
 		{
-			for(int q = 0; q < 30; q++)
-			{
-				g2d.drawRect(i*SectorSize+350-screenCenteredX, q*SectorSize+350-screenCenteredY, SectorSize, SectorSize);
-			}
-		}//*/
-	//renders icons
-		for(int i = 0; i < ParticleList.size(); i++)
-		{
-
-			Particle displayed = ParticleList.get(i);
-			double screenx = displayed.X -screenCenteredX + 350;
-			double screeny = displayed.Y -screenCenteredY + 350;
-
-			if(displayed.active == true && screenx < 750 && screenx > -50 && screeny < 750 && screeny > -50)
-			{
-
-				double[] finalrotations = new double[displayed.Directions.length];
-				System.arraycopy(displayed.Directions, 0, finalrotations, 0, displayed.Directions.length);
-				for(int q = 0; q < finalrotations.length; q++)
-				{
-					finalrotations[q] += displayed.Rotation; //rotates
-				}
-				double[] xshift = new double[finalrotations.length];
-				double[] yshift = new double[finalrotations.length];//creates an empty array for now
-				double[] magnitudes = displayed.Magnitudes;
-				for(int q = 0; q < finalrotations.length; q++)
-				{
-					xshift[q] = magnitudes[q] * (Math.cos(finalrotations[q])); // changes into x and y 
-					yshift[q] = magnitudes[q] * (Math.sin(finalrotations[q]));
-				}
-
-				int[] xPoints = new int[finalrotations.length];
-				int[] yPoints = new int[finalrotations.length];
-				for(int q = 0; q < finalrotations.length; q++)
-				{
-					xPoints[q] = (int)Math.rint(xshift[q]/1 + screenx/1);
-					yPoints[q] = (int)Math.rint(yshift[q]/1 + screeny/1);
-
-				}
-
-				g2d.setPaint(displayed.Fill);
-				g2d.fillPolygon(xPoints, yPoints, xPoints.length);
-				g2d.setPaint(displayed.Outline);
-				g2d.drawPolygon(xPoints, yPoints, xPoints.length);	
-				///*
-				g2d.setPaint(Color.white);
-				g2d.drawOval((int)(-displayed.Radius + screenx),
-						(int)(-displayed.Radius + screeny),
-						(int)displayed.Radius*2, (int)displayed.Radius*2);//*/
-			}
-
+			UsefulSoundImageMethods.DrawParticles(g2d);
+			UsefulSoundImageMethods.DrawGameBar(g2d);
 		}
-
-		g2d.setPaint(Color.GRAY);
-		g2d.fillRect(700, 0, 2000, 2000);
-
-		g2d.setPaint(Color.white);	
-		g2d.fillRect(710, 20, 80, 20);//pause
-		g2d.fillRect(800, 20, 80, 20);//
-		g2d.fillRect(890, 20, 80, 20);
-		g2d.fillRect(710, 50, 260, 20);
-		g2d.setPaint(Color.black);
-		if(gamepaused == true) { g2d.drawString("PLAY", 713, 35); }
-		else{ g2d.drawString("PAUSE", 713, 35); }
-		g2d.drawString("TRACING", 893, 35);
-		g2d.drawString("ADD_OBJECT", 803, 35);
-		g2d.drawString("CHANGE_APPLICATION_SPEED", 713, 65);
-		g2d.setPaint(Color.white);
-		g2d.drawString("STATS:", 700, 100);
-		if(UsefulParticleMethods.GetPlayerIndex() > -1)
+		else if(currentScreen == "title")
 		{
-			Particle playerparticle = ParticleList.get(UsefulParticleMethods.GetPlayerIndex());
-			Entity playerentity = EntityMap.get(playerparticle);
-			g2d.drawString("YOUR_HEALTH: " + playerentity.CurrentHealth, 700, 120);
-
-
-			String shields = "" +(int)(100*(playerentity.EntityShield.CurrentHitpoints/playerentity.EntityShield.MaxHitpoints))+"%";
-			if(playerentity.EntityShield.Failed == true){shields = "FAILED";}
-			g2d.drawString("YOUR_SHIELDS: " + shields,700,140);
-
-			g2d.drawString("YOUR_RECHARGE: " + (int)(100*(playerentity.EntityWeapon.CurrentReload/playerentity.EntityWeapon.MaxReload)) +"%",700,160);//What weapon the entity has. Every entry will have a name, velocity, spread, damage boost, amount fired at once, how long to reload, and current reload
-			g2d.drawString("YOUR_X_VELOCITY: " +(float)(playerparticle.Xvel), 700, 180);
-			g2d.drawString("YOUR_Y_VELOCITY: " +(float)(playerparticle.Yvel), 700, 200);
-			g2d.drawString("YOUR_ROTATION: " + (int)((180/Math.PI)*playerparticle.Rotation), 700, 220);
-			g2d.drawString("RADAR:", 700, 240);
-			g2d.setPaint(ColorBlack);
-			g2d.fillRect(700, 350, 280, 280);
-			g2d.setPaint(Color.green);
-			g2d.drawRect(700, 350, 280, 280);
-			g2d.drawOval(700, 350, 280, 280);
-			g2d.drawOval(700+40, 350+40, 200, 200);
-			g2d.drawOval(700+80, 350+80, 120, 120);
-			g2d.drawOval(700+120, 350+120, 40, 40);
-			g2d.fillOval(700+138, 350+138, 5, 5);
+			UsefulSoundImageMethods.DrawTitleScreen(g2d);
 		}
-
-
 	}
 
 	public static void main(String[] args)

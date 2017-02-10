@@ -217,14 +217,14 @@ public class UsefulParticleMethods
 
 
 		double direction = GetDirection(p2, p1);
-		
-		p1.X += 1*Math.cos(direction);
-		p1.Y += 1*Math.sin(direction);
+		double magnitude = 1;
+		p1.X += magnitude*Math.cos(direction);
+		p1.Y += magnitude*Math.sin(direction);
 		
 		direction = GetDirection(p1, p2);
-		
-		p2.X += 1*Math.cos(direction);
-		p2.Y += 1*Math.sin(direction);
+		magnitude = 1;
+		p2.X += magnitude*Math.cos(direction);
+		p2.Y += magnitude*Math.sin(direction);
 		
 		
 	}
@@ -313,7 +313,7 @@ public class UsefulParticleMethods
 		String type = "asteroid";
 		String info = "A large rock that may contain valuable metals";
 		double damageoncontact = 1;
-		double health = mass*50;
+		double health = mass*5000;
 		double regen = 0.001;
 		CreateEntity(host, type, info, health, regen, damageoncontact);
 		return Main.ParticleList.size()-1;
@@ -366,10 +366,10 @@ public class UsefulParticleMethods
 		double rotation = Math.atan2(yvel, xvel);
 		double mass = 2;
 		double radius = 0.5;
-		//double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
-		//double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
-		double[] xs = new double[] {1,0};
-		double[] ys = new double[] {0,0};		
+		double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
+		double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
+		//double[] xs = new double[] {1,0};
+		//double[] ys = new double[] {0,0};		
 		
 		double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 		double[] directions = GetDirectionsForParticle(xs,ys);
