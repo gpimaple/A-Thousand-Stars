@@ -344,18 +344,6 @@ public class UsefulParticleMethods
 		rotated.Rotation = newrotation;
 	}
 
-	//checks if button has been clicked
-	public static boolean IsButtonClicked(int x, int y, int width, int height)
-	{
-		if(Main.mousex >= x && Main.mousex <= x+width && Main.mousey >= y && Main.mousey <=y+height)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 
 
 
@@ -366,10 +354,10 @@ public class UsefulParticleMethods
 		double rotation = Math.atan2(yvel, xvel);
 		double mass = 2;
 		double radius = 0.5;
-		double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
-		double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
-		//double[] xs = new double[] {1,0};
-		//double[] ys = new double[] {0,0};		
+		//double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
+		//double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
+		double[] xs = new double[] {1,0};
+		double[] ys = new double[] {0,0};		
 		
 		double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 		double[] directions = GetDirectionsForParticle(xs,ys);

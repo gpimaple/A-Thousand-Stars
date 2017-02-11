@@ -159,7 +159,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	
 	
 	
-	int PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
+	public static int PlayerIndex = -1;
 
 
 	public static Sector[][] SectorList = new Sector[MapSize][MapSize];
@@ -199,7 +199,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		gamemiliseconds = 50;
 		Thread.sleep(50);
 		
-		System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
+		//System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
 		if(gameActive == true)
 		{
@@ -222,23 +222,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 
 
-	void GUI()
-	{
-		PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
-		if(PlayerIndex > -1)
-		{ 
-			screenCenteredX = (int)(ParticleList.get(PlayerIndex).X);
-			screenCenteredY = (int)(ParticleList.get(PlayerIndex).Y);
-		}
-		if(mouseclickedrecently == true)//if mouse has been clicked
-		{
-			if(UsefulParticleMethods.IsButtonClicked(710, 20,80,20))
-			{
-				gameActive = !gameActive;
-			}
-			mouseclickedrecently = false;
-		}
-	}
 
 	void UpdateEntity(int i)
 	{
@@ -432,10 +415,17 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			UsefulSoundImageMethods.DrawParticles(g2d);
 			UsefulSoundImageMethods.DrawGameBar(g2d);
 		}
+		else if(currentScreen == "inventory")
+		{
+			UsefulSoundImageMethods.DrawParticles(g2d);
+			UsefulSoundImageMethods.DrawGameBar(g2d);
+			UsefulSoundImageMethods.DrawInventoryInGame(g2d);
+		}
 		else if(currentScreen == "title")
 		{
 			UsefulSoundImageMethods.DrawTitleScreen(g2d);
 		}
+		mouseclickedrecently = false;
 	}
 
 	public static void main(String[] args)

@@ -1,6 +1,7 @@
 package usefulMethods;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -21,7 +22,7 @@ import mainPackage.Particle;
 public class UsefulSoundImageMethods{
 
 	public static Clip CurrentBackgroundMusic = null;
-	
+
 	public static void PlayBackgroundMusic(String filename)//plays a clip over and over again
 	{
 		CurrentBackgroundMusic = null;//stops old background music
@@ -29,13 +30,13 @@ public class UsefulSoundImageMethods{
 		clip.loop(Clip.LOOP_CONTINUOUSLY);//plays background music
 	}
 
-	
+
 	public static void PlaySound(String filename)
 	{
 		Clip clip = GetSoundClip(filename);
 		clip.start();
 	}
-	
+
 	public static Clip GetSoundClip(String filename)
 	{
 		Clip clip = null;
@@ -45,7 +46,7 @@ public class UsefulSoundImageMethods{
 			// Get a sound clip resource.
 			clip = AudioSystem.getClip();
 			clip.open(audioIn);
-			
+
 		} catch (UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -55,7 +56,21 @@ public class UsefulSoundImageMethods{
 		}
 		return clip;
 	}
-	
+
+	//checks if button has been clicked
+	public static boolean IsButtonClicked(int x, int y, int width, int height)
+	{
+		if(Main.mousex >= x && Main.mousex <= x+width && Main.mousey >= y && Main.mousey <=y+height)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
 	public static void DrawParticles(Graphics2D g2d)
 	{
 		//renders icons
@@ -68,35 +83,44 @@ public class UsefulSoundImageMethods{
 
 			if(displayed.active == true && screenx < 750 && screenx > -50 && screeny < 750 && screeny > -50)
 			{
-
-				double[] finalrotations = new double[displayed.Directions.length];
-				System.arraycopy(displayed.Directions, 0, finalrotations, 0, displayed.Directions.length);
-				for(int q = 0; q < finalrotations.length; q++)
+				if(displayed.Sprite == null)
 				{
-					finalrotations[q] += displayed.Rotation; //rotates
+					double[] finalrotations = new double[displayed.Directions.length];
+					System.arraycopy(displayed.Directions, 0, finalrotations, 0, displayed.Directions.length);
+					for(int q = 0; q < finalrotations.length; q++)
+					{
+						finalrotations[q] += displayed.Rotation; //rotates
+					}
+					double[] xshift = new double[finalrotations.length];
+					double[] yshift = new double[finalrotations.length];//creates an empty array for now
+					double[] magnitudes = displayed.Magnitudes;
+					for(int q = 0; q < finalrotations.length; q++)
+					{
+						xshift[q] = magnitudes[q] * (Math.cos(finalrotations[q])); // changes into x and y 
+						yshift[q] = magnitudes[q] * (Math.sin(finalrotations[q]));
+					}
+
+					int[] xPoints = new int[finalrotations.length];
+					int[] yPoints = new int[finalrotations.length];
+					for(int q = 0; q < finalrotations.length; q++)
+					{
+						xPoints[q] = (int)Math.rint(xshift[q]/1 + screenx/1);
+						yPoints[q] = (int)Math.rint(yshift[q]/1 + screeny/1);
+
+					}
+
+					g2d.setPaint(displayed.Fill);
+					g2d.fillPolygon(xPoints, yPoints, xPoints.length);
+					g2d.setPaint(displayed.Outline);
+					g2d.drawPolygon(xPoints, yPoints, xPoints.length);	
 				}
-				double[] xshift = new double[finalrotations.length];
-				double[] yshift = new double[finalrotations.length];//creates an empty array for now
-				double[] magnitudes = displayed.Magnitudes;
-				for(int q = 0; q < finalrotations.length; q++)
+				else
 				{
-					xshift[q] = magnitudes[q] * (Math.cos(finalrotations[q])); // changes into x and y 
-					yshift[q] = magnitudes[q] * (Math.sin(finalrotations[q]));
+					Image img = displayed.Sprite;
+					int imgwidth = img.getWidth(null);
+					int imgheight = img.getHeight(null);
+					g2d.drawImage(img, (int)Math.rint(screenx- imgwidth/2), (int)Math.rint(screeny- imgheight/2), null);
 				}
-
-				int[] xPoints = new int[finalrotations.length];
-				int[] yPoints = new int[finalrotations.length];
-				for(int q = 0; q < finalrotations.length; q++)
-				{
-					xPoints[q] = (int)Math.rint(xshift[q]/1 + screenx/1);
-					yPoints[q] = (int)Math.rint(yshift[q]/1 + screeny/1);
-
-				}
-
-				g2d.setPaint(displayed.Fill);
-				g2d.fillPolygon(xPoints, yPoints, xPoints.length);
-				g2d.setPaint(displayed.Outline);
-				g2d.drawPolygon(xPoints, yPoints, xPoints.length);	
 				/*
 				g2d.setPaint(Color.white);
 				g2d.drawOval((int)(-displayed.Radius + screenx),
@@ -106,9 +130,10 @@ public class UsefulSoundImageMethods{
 
 		}
 	}
-	
+
 	public static void DrawGameBar(Graphics2D g2d)
 	{
+		g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
 		g2d.setPaint(Color.GRAY);
 		g2d.fillRect(700, 0, 2000, 2000);
 
@@ -118,10 +143,20 @@ public class UsefulSoundImageMethods{
 		g2d.fillRect(890, 20, 80, 20);
 		g2d.fillRect(710, 50, 260, 20);
 		g2d.setPaint(Color.black);
-		if(Main.gameActive == false) { g2d.drawString("PLAY", 713, 35); }
-		else{ g2d.drawString("PAUSE", 713, 35); }
-		g2d.drawString("TRACING", 893, 35);
-		g2d.drawString("ADD_OBJECT", 803, 35);
+		if(Main.currentScreen == "game")
+		{
+			if(Main.gameActive == false) { g2d.drawString("PLAY", 713, 35); }
+			else{ g2d.drawString("PAUSE", 713, 35); }
+		}
+		g2d.drawString("SAVE/LOAD", 893, 35);
+		if(Main.currentScreen == "inventory")
+		{
+			g2d.drawString("CLOSE", 803, 35);
+		}
+		else
+		{
+			g2d.drawString("INVENTORY", 803, 35);
+		}
 		g2d.drawString("CHANGE_APPLICATION_SPEED", 713, 65);
 		g2d.setPaint(Color.white);
 		g2d.drawString("STATS:", 700, 100);
@@ -142,11 +177,72 @@ public class UsefulSoundImageMethods{
 			g2d.drawString("YOUR_ROTATION: " + (int)((180/Math.PI)*playerparticle.Rotation), 700, 220);
 			g2d.drawString("RADAR:", 700, 240);
 		}
+
+		Main.PlayerIndex = UsefulParticleMethods.GetPlayerIndex();
+		if(Main.PlayerIndex > -1)
+		{ 
+			Main.screenCenteredX = (int)(Main.ParticleList.get(Main.PlayerIndex).X);
+			Main.screenCenteredY = (int)(Main.ParticleList.get(Main.PlayerIndex).Y);
+		}
+		if(Main.mouseclickedrecently == true && Main.currentScreen == "game")//if mouse has been clicked
+		{
+			if(IsButtonClicked(710, 20,80,20))
+			{
+				Main.gameActive = !Main.gameActive;
+			}
+			if(IsButtonClicked(800, 20, 80, 20))
+			{
+				Main.currentScreen = "inventory";
+				Main.gameActive = false;
+			}
+		}
+
+
 	}
 	
+	
+	//ALso handles inventory stuff
+	public static void DrawInventoryInGame(Graphics2D g2d)
+	{
+		Color overlay = new Color(70,50,50, 100);
+		g2d.setPaint(overlay);
+		g2d.fillRect(0,0, 700, 700);
+		g2d.setPaint(Color.RED);
+		g2d.setFont(new Font("Courier New", Font.BOLD, 20));
+		g2d.drawString("INVENTORY", 300, 50);
+		g2d.setPaint(Color.RED);
+		for(int i = 0; i < 10; i++)
+	    {
+			for(int a = 0; a < 10; a++)
+		    {	
+				g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
+		    }
+	    }
+		if(Main.mouseclickedrecently == true)//if mouse has been clicked
+		{
+			if(IsButtonClicked(800, 20,80,20))
+			{
+				Main.currentScreen = "game";
+			}
+		}
+	}
+
+
 	public static Image titlebackground =  Toolkit.getDefaultToolkit().getImage("Resources/Images/TitleScreen.png");
 	public static void DrawTitleScreen(Graphics2D g2d)
 	{
 		g2d.drawImage(titlebackground, 0, 0, null );
+		g2d.setFont(new Font("Courier New", Font.PLAIN, 40));
+		g2d.setPaint(Color.white);
+		if(IsButtonClicked(280, 250, 420, 70))
+		{
+			g2d.fillRect(280, 250, 420, 70);
+			g2d.setPaint(Color.black);
+			if(Main.mouseclickedrecently)
+			{
+				Main.currentScreen = "game";
+			}
+		}
+		g2d.drawString("A Thousand Stars", 300, 300);
 	}
 }

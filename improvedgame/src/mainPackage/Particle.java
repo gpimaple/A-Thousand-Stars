@@ -1,5 +1,6 @@
 package mainPackage;
 import java.awt.Color;
+import java.awt.Image;
 //remember, all these classes are just wrappers meant to hold the values.
 /* The particle is meant to display and move according to its velocity. 
  * It will disappear eventually. It is controlled by entity.
@@ -20,6 +21,7 @@ public class Particle
 	public double[] Directions;
 	public Color Fill;// fill color
 	public Color Outline;//outline color
+	public Image Sprite = null;
 	public int countdown = 1000;// This decreases by 1 each tick. If it reaches 0, then the particle removes itself. Not needed if it has an AI
 	public boolean active = true;
 	public boolean tobedestroyed = false;
