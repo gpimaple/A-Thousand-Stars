@@ -19,9 +19,10 @@ public class Item {
 	//shields absorb some percentage of the damage. When the shields' own health drops below zero, they fail for a period of time
 	public boolean IsShield = false;
 	public double DamageMultiplier;//the number the damage is multiplied by. Lower is better
-	public double MaxHealth;//the max amount of health the shield can have
-	public double CurrentHealth;//the current amount of health the shield has
+	public double MaxHitpoints;//the max amount of health the shield can have
+	public double CurrentHitpoints;//the current amount of health the shield has
 	public double RegenPerTick; //the amount of regen per tick
+	public boolean Failed = false; //whether the shield has failed
 	public double FixTime;//the amount of time that the shield will fail. Influenced by regen
 	public double CurrentFix; //the current fix level
 	public double PowerConsumptionPerRegenTick;//when regenerating health, this is the amount of power it will draw per tick
@@ -39,7 +40,7 @@ public class Item {
 	public double Velocity; // the velocity of the entity
 	public double Spread; // the spread in radians
 	public double DamageBoost;// the damage multiplier
-	public int NumberFiredAtOnce;//bullets fired at once
+	public int    NumberFiredAtOnce;//bullets fired at once
 	public double MaxWeaponReload;//Max reload level
 	public double CurrentWeaponReload;//the current reload
 	public double WeaponRegeneration; //how fast it reloads
@@ -57,8 +58,8 @@ public class Item {
 	{
 		IsShield = true;
 		DamageMultiplier = dammult;
-		MaxHealth = max;
-		CurrentHealth = max;
+		MaxHitpoints = max;
+		CurrentHitpoints = max;
 		RegenPerTick = regen;
 		FixTime = fixtime;
 		CurrentFix = 0;

@@ -178,10 +178,12 @@ public class UsefulParticleMethods
 	}
 	// creates an entity and adds it to the hashmap
 	public static Entity CreateEntity(Particle host, String type, String info,
+			Item[] items,
 			double maxhealth, double healthregen, //health
 			double damageoncontact)//contactbehavior)
 	{
 		Entity newEntity = new Entity (host, type, info,
+				items,
 				maxhealth, healthregen, 
 				damageoncontact);
 		Main.EntityMap.put(host,newEntity);
@@ -268,10 +270,6 @@ public class UsefulParticleMethods
 		Particle host = Main.ParticleList.get(hostnumber);
 		String type = "player";
 		String info = "You";
-		Shield shield = new Shield("ZetaCorp Defense Shield", 0.5, 600, 0.003, 9000);
-		Thruster thruster = new Thruster("Standard Galactic Rocketry Basic Thruster", 0.5);
-		Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 50, 1);
-		//Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.9, 500, 5, 1, 1);
 		double maxhealth = 500;
 		double healthregen = 0.001;
 		double damageoncontact = 10;

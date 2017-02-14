@@ -167,11 +167,11 @@ public class UsefulSoundImageMethods{
 			g2d.drawString("YOUR_HEALTH: " + playerentity.CurrentHealth, 700, 120);
 
 
-			String shields = "" +(int)(100*(playerentity.EntityShield.CurrentHitpoints/playerentity.EntityShield.MaxHitpoints))+"%";
-			if(playerentity.EntityShield.Failed == true){shields = "FAILED";}
+			String shields = "" +(int)(100*(playerentity.Shield.CurrentHitpoints/playerentity.Shield.MaxHitpoints))+"%";
+			if(playerentity.Shield.Failed == true){shields = "FAILED";}
 			g2d.drawString("YOUR_SHIELDS: " + shields,700,140);
 
-			g2d.drawString("YOUR_RECHARGE: " + (int)(100*(playerentity.EntityWeapon.CurrentReload/playerentity.EntityWeapon.MaxReload)) +"%",700,160);//What weapon the entity has. Every entry will have a name, velocity, spread, damage boost, amount fired at once, how long to reload, and current reload
+			g2d.drawString("YOUR_RECHARGE: " + (int)(100*(playerentity.Weapon.CurrentWeaponReload/playerentity.Weapon.MaxWeaponReload)) +"%",700,160);
 			g2d.drawString("YOUR_X_VELOCITY: " +(float)(playerparticle.Xvel), 700, 180);
 			g2d.drawString("YOUR_Y_VELOCITY: " +(float)(playerparticle.Yvel), 700, 200);
 			g2d.drawString("YOUR_ROTATION: " + (int)((180/Math.PI)*playerparticle.Rotation), 700, 220);
