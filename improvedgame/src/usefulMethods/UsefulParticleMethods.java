@@ -216,10 +216,15 @@ public class UsefulParticleMethods
 		p1.Yvel = Math.sin(colAng)*final_Xvel_1+Math.sin(colAng+Math.PI/2)*final_Yvel_1;
 		p2.Xvel = Math.cos(colAng)*final_Xvel_2+Math.cos(colAng+Math.PI/2)*final_Yvel_2;
 		p2.Yvel = Math.sin(colAng)*final_Xvel_2+Math.sin(colAng+Math.PI/2)*final_Yvel_2;
-
-
+/*
+		p1.X += p1.Xvel;
+		p1.Y += p1.Yvel;
+		p2.X += p2.Xvel;
+		p2.Y += p2.Yvel;
+	*/	
+		
 		double direction = GetDirection(p2, p1);
-		double magnitude = 1;
+		double magnitude = 0.1;
 		p1.X += magnitude*Math.cos(direction);
 		p1.Y += magnitude*Math.sin(direction);
 

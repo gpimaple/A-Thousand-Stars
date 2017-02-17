@@ -7,9 +7,11 @@ import mainPackage.Item;
 
 public class UsefulItemMethods {
 	
+	
+	
 	public static Item GlorbroxNuclearReactor()
 	{
-		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ImageSprite/Shields/ZetaCorp_Standard.png");
+		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ItemSprite/Generators/GlorboxNuclearReactor.png");
 		Item generator = new Item(
 				"Glorbrox Nuclear Reactor", 
 				"An alien nuclear reactor barely held together with glue and caution tape.",
@@ -27,7 +29,7 @@ public class UsefulItemMethods {
 	
 	public static Item ZetaCorpDefenseShield()
 	{
-		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ImageSprite/Shields/ZetaCorp_Standard.png");
+		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ItemSprite/Shields/ZetaCorpStandardDefenseShield.png");
 		Item shield = new Item(
 				"ZetaCorp Defense Shield", 
 				"A standard shield produced by the massive Zetacorp corporation.",
@@ -47,7 +49,7 @@ public class UsefulItemMethods {
 	
 	public static Item StandardGalacticRocketryBasicThruster()
 	{
-		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ImageSprite/Thrusters/Standard Galactic Rocketry Basic Thruster.png");
+		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ItemSprite/Thrusters/StandardGalacticRocketryBasicThruster.png");
 		Item thruster = new Item(
 				"Standard Galactic Rocketry Basic Thruster", 
 				"An old fashioned basic thruster.",
@@ -63,7 +65,7 @@ public class UsefulItemMethods {
 	
 	public static Item ZetaCorpAsteroidHarvester()
 	{
-		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ImageSprite/Generators/GlorboxNuclearReactor.png");
+		Image sprite =  Toolkit.getDefaultToolkit().getImage("Resources/Images/ItemSprite/Weapons/ZetaCorpAsteroidHarvester.png");
 		//Weapon weapon = new Weapon("ZetaCorp Asteroid Harvester", 1, 0.0, 5, 1, 50, 1);
 		Item weapon = new Item(
 				"ZetaCorp Asteroid Harvester", 

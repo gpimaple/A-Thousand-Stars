@@ -16,6 +16,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import mainPackage.Entity;
+import mainPackage.Item;
 import mainPackage.Main;
 import mainPackage.Particle;
 
@@ -184,7 +185,7 @@ public class UsefulSoundImageMethods{
 			Main.screenCenteredX = (int)(Main.ParticleList.get(Main.PlayerIndex).X);
 			Main.screenCenteredY = (int)(Main.ParticleList.get(Main.PlayerIndex).Y);
 		}
-		if(Main.mouseclickedrecently == true && Main.currentScreen == "game")//if mouse has been clicked
+		if(Main.leftmousepressedrecently == true && Main.currentScreen == "game")//if mouse has been clicked
 		{
 			if(IsButtonClicked(710, 20,80,20))
 			{
@@ -200,7 +201,7 @@ public class UsefulSoundImageMethods{
 
 	}
 
-
+	public static int draggedindex = -1;
 	//ALso handles inventory stuff
 	public static void DrawInventoryInGame(Graphics2D g2d)
 	{
@@ -214,22 +215,54 @@ public class UsefulSoundImageMethods{
 		if(Main.PlayerIndex > -1)
 		{
 			Entity playerentity = Main.EntityMap.get(Main.ParticleList.get(Main.PlayerIndex));
+			int inventorysize = playerentity.Inventory.length;
 			for(int i = 0; i < 10; i++)
 			{
 				for(int a = 0; a < 10; a++)
 				{	
-					g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
-					
 					int index = a*10 + i;
-					if(playerentity.Inventory.length > index && playerentity.Inventory[index] != null)
+					if(index < inventorysize)
 					{
-						Image sprite = playerentity.Inventory[index].Sprite;
-						g2d.drawImage(sprite, 110+(i)*50, 80+(a)*50, null);
+						g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
+						if(playerentity.Inventory[index] != null//if there is something in the slot
+								&& draggedindex != index)//if the sprite is not being dragged
+						{
+							Image sprite = playerentity.Inventory[index].Sprite;
+							g2d.drawImage(sprite, 110+(i)*50, 80+(a)*50, null);
+						}
+						if(Main.leftmousepressedrecently == true 
+								&& IsButtonClicked(110+(i)*50, 80+(a)*50,32,32))//if mouse has been clicked
+						{
+							draggedindex = index;
+						}
+						if(Main.leftmousereleasedrecently == true
+								&& IsButtonClicked(110+(i)*50, 80+(a)*50,32,32))
+						{
+							Item item1 = playerentity.Inventory[draggedindex];
+							Item item2 = playerentity.Inventory[index];
+							
+							playerentity.Inventory[index] = item1;
+							playerentity.Inventory[draggedindex] = item2;
+							draggedindex = -1;
+						}
+						
 					}
 				}
 			}
+			if(Main.leftmousedown == true
+					&& draggedindex != -1)
+			{
+				Image img = playerentity.Inventory[draggedindex].Sprite;
+				int imgxoffset = Math.round(img.getWidth(null)/2);
+				int imgyoffset = Math.round(img.getHeight(null)/2);
+				g2d.drawImage(img, (int)Math.rint(Main.mousex-imgxoffset), (int)Math.rint(Main.mousey-imgyoffset), null);
+			}
+			else
+			{
+				draggedindex = -1;
+			}
 		}
-		if(Main.mouseclickedrecently == true)//if mouse has been clicked
+		if(Main.leftmousepressedrecently == true)//if mouse has been clicked
 		{
 			if(IsButtonClicked(800, 20,80,20))
 			{
@@ -249,7 +282,7 @@ public class UsefulSoundImageMethods{
 		{
 			g2d.fillRect(280, 250, 420, 70);
 			g2d.setPaint(Color.black);
-			if(Main.mouseclickedrecently)
+			if(Main.leftmousepressedrecently)
 			{
 				Main.currentScreen = "game";
 			}

@@ -13,6 +13,7 @@ import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import usefulMethods.Sector;
 import usefulMethods.UsefulParticleMethods;
@@ -52,14 +53,34 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	public void mousePressed(MouseEvent e) 
 	{
-		mouseclickedrecently = true;
-		mousedown = true;
+		
+		if(SwingUtilities.isRightMouseButton(e));
+		{
+			rightmousepressedrecently = true;
+			rightmousedown = true;
+		}
+		if(SwingUtilities.isLeftMouseButton(e))
+		{
+			leftmousepressedrecently = true;
+			leftmousedown = true;
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) 
 	{
-		mousedown = false;
+		if(SwingUtilities.isRightMouseButton(e));
+		{
+			rightmousereleasedrecently = true;
+			rightmousedown = false;
+		}
+		if(SwingUtilities.isLeftMouseButton(e))
+		{
+			leftmousereleasedrecently = true;
+			leftmousedown = false;
+		}
+		
+		
 	}
 
 
@@ -140,8 +161,15 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	public static double mousex = 0;
 	public static double mousey = 0;
-	public static boolean mousedown = false;
-	public static boolean mouseclickedrecently = true;
+	public static boolean leftmousedown = false;
+	public static boolean rightmousedown = false;
+	
+	public static boolean leftmousepressedrecently = false;
+	public static boolean rightmousepressedrecently = false;
+	
+	public static boolean leftmousereleasedrecently = false;
+	public static boolean rightmousereleasedrecently = false;
+	
 
 	public static boolean spacekeydown = false;
 	public static boolean upkeydown = false;
@@ -446,7 +474,10 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		{
 			UsefulSoundImageMethods.DrawTitleScreen(g2d);
 		}
-		mouseclickedrecently = false;
+		leftmousepressedrecently = false;
+		rightmousepressedrecently = false;
+		leftmousereleasedrecently = false;
+		rightmousereleasedrecently = false;
 	}
 
 	public static void main(String[] args)
