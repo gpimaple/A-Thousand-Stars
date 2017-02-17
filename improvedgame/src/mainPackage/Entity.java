@@ -30,6 +30,28 @@ public class Entity
 		
 		Inventory = inventory;
 		
+		//get generator, Shield, Weapon, thruster
+		for(int i = 0; i < Inventory.length; i++)
+		{
+			if(Inventory[i].IsGenerator == true)
+			{
+				Generator = Inventory[i];
+			}
+			if(Inventory[i].IsShield == true)
+			{
+				Shield = Inventory[i];
+			}
+			if(Inventory[i].IsWeapon == true)
+			{
+				Weapon = Inventory[i];
+			}
+			if(Inventory[i].IsThruster == true)
+			{
+				Thruster = Inventory[i];
+			}
+		}
+		
+		
 		MaxHealth = maxhealth;
 		CurrentHealth = maxhealth;//defaults to full health. Can be modified if this is not needed
 		HealthRegen = healthregen;

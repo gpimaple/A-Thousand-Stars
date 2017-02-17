@@ -54,16 +54,16 @@ public class UsefulParticleMethods
 
 				double xmin = p1.X - p1.Radius;
 				double xmax = p1.X + p1.Radius;
-				
+
 				double ymin = p1.Y - p1.Radius;
 				double ymax = p1.Y + p1.Radius;
-				
+
 				int xminsector = (int)(xmin/Main.SectorSize);
 				int yminsector = (int)(ymin/Main.SectorSize);
 				int xmaxsector = (int)(xmax/Main.SectorSize);
 				int ymaxsector = (int)(ymax/Main.SectorSize);
-				
-				
+
+
 				for(int x = xminsector; x <= xmaxsector; x++)//iterate through all the sectors it is in
 				{
 					for(int y = yminsector; y <= ymaxsector; y++)
@@ -222,13 +222,13 @@ public class UsefulParticleMethods
 		double magnitude = 1;
 		p1.X += magnitude*Math.cos(direction);
 		p1.Y += magnitude*Math.sin(direction);
-		
+
 		direction = GetDirection(p1, p2);
 		magnitude = 1;
 		p2.X += magnitude*Math.cos(direction);
 		p2.Y += magnitude*Math.sin(direction);
-		
-		
+
+
 	}
 
 
@@ -273,10 +273,12 @@ public class UsefulParticleMethods
 		double maxhealth = 500;
 		double healthregen = 0.001;
 		double damageoncontact = 10;
-		Entity player = CreateEntity(host, type, info, maxhealth, healthregen, damageoncontact);
-		player.EntityShield = shield;
-		player.EntityThruster = thruster;
-		player.EntityWeapon = weapon;
+		Item generator = UsefulItemMethods.GlorbroxNuclearReactor();
+		Item shield = UsefulItemMethods.ZetaCorpDefenseShield();
+		Item thruster = UsefulItemMethods.StandardGalacticRocketryBasicThruster();
+		Item weapon = UsefulItemMethods.ZetaCorpAsteroidHarvester();
+		Item[] items = new Item[] {generator, shield, thruster, weapon};
+		Entity player = CreateEntity(host, type, info, items, maxhealth, healthregen, damageoncontact);
 	}
 	//creates an asteroid. Asteroids are floating rocks not affected by gravity. They 
 	// can be damaged when a player shoots them and will eventually explode, producing metals.
@@ -306,14 +308,15 @@ public class UsefulParticleMethods
 		int hostnumber = CreateParticle(x, y, rotation, mass, radius, directions, magnitudes, fill, outline);
 		Particle host = Main.ParticleList.get(hostnumber);
 		host.GravityMultiplier = 0;
-		//host.Xvel = 0.0001*Math.random();
-		//host.Yvel = 0.0001*Math.random();
+		host.Xvel = 0*Math.random();
+		host.Yvel = 0*Math.random();
 		String type = "asteroid";
 		String info = "A large rock that may contain valuable metals";
 		double damageoncontact = 1;
-		double health = mass*5000;
+		double health = mass*100;
 		double regen = 0.001;
-		CreateEntity(host, type, info, health, regen, damageoncontact);
+		Item[] items = new Item[] {};
+		CreateEntity(host, type, info, items, health, regen, damageoncontact);
 		return Main.ParticleList.size()-1;
 	}
 
@@ -330,10 +333,15 @@ public class UsefulParticleMethods
 	public static void MoveEntity(Particle updated)
 	{
 		Entity updatede = Main.EntityMap.get(updated);
-		if(updatede.EntityThruster != null)
+		if(updatede.Thruster != null)
 		{
-			double thrustforce = updatede.EntityThruster.Acceleration;
-			AddVector(updated, updated.Rotation,thrustforce);
+			if(updatede.Generator != null
+					&& updatede.Generator.CurrentPower >= updatede.Thruster.PowerConsumptionPerThrust)
+			{
+				double thrustforce = updatede.Thruster.Acceleration;
+				AddVector(updated, updated.Rotation,thrustforce);
+				updatede.Generator.CurrentPower -= updatede.Thruster.PowerConsumptionPerThrust;
+			}
 		}
 	}
 
@@ -350,13 +358,13 @@ public class UsefulParticleMethods
 		//x = x
 		//y = y
 		double rotation = Math.atan2(yvel, xvel);
-		double mass = 2;
+		double mass = 0.5;
 		double radius = 0.5;
 		//double[] xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
 		//double[] ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
 		double[] xs = new double[] {1,0};
 		double[] ys = new double[] {0,0};		
-		
+
 		double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 		double[] directions = GetDirectionsForParticle(xs,ys);
 		Color fillcolor = new Color(255,255,255,255);
@@ -371,7 +379,8 @@ public class UsefulParticleMethods
 		double maxhealth = 10;
 		double healthregen = -0.03;
 		double damageoncontact = 10;
-		CreateEntity(host, type, info, maxhealth, healthregen, damageoncontact);
+		Item[] items = new Item[]{};
+		CreateEntity(host, type, info, items, maxhealth, healthregen, damageoncontact);
 		Main.EntityMap.get(host).EntityDamageSelfOnContact = 11;
 		return hostnumber;
 	}
@@ -381,33 +390,37 @@ public class UsefulParticleMethods
 	public static void ShootEntity(Particle shooter)
 	{
 		Entity shooterEntity = Main.EntityMap.get(shooter);
-		if(shooterEntity.EntityWeapon != null && shooterEntity.EntityWeapon.CurrentReload >= shooterEntity.EntityWeapon.MaxReload)
+		if(shooterEntity.Weapon != null 
+				&& shooterEntity.Weapon.CurrentWeaponReload >= shooterEntity.Weapon.MaxWeaponReload
+				&& shooterEntity.Generator.CurrentPower >= shooterEntity.Weapon.PowerConsumptionWhenFired)
 		{
-			for(int q = 0; q < shooterEntity.EntityWeapon.NumberAtOnce; q++)
+			shooterEntity.Generator.CurrentPower -= shooterEntity.Weapon.PowerConsumptionWhenFired;
+			for(int q = 0; q < shooterEntity.Weapon.NumberFiredAtOnce; q++)
 			{
-				double rotation = shooter.Rotation + (Math.random()-0.5) * shooterEntity.EntityWeapon.Spread;
+				double rotation = shooter.Rotation + (Math.random()-0.5) * shooterEntity.Weapon.Spread;
 				double setback = shooter.Radius + 2;
 				double x = shooter.X + Math.cos(rotation)*setback*2;
 				double y = shooter.Y + Math.sin(rotation)*setback*2;
-				double velocity = shooterEntity.EntityWeapon.Velocity;
+				double velocity = shooterEntity.Weapon.Velocity;
 				double xvel = shooter.Xvel + Math.cos(rotation)*velocity;
 				double yvel = shooter.Yvel + Math.sin(rotation)*velocity;
+				// TODO differentiate for bullets
 				int particlenum = CreateElectronTorpedo(x,y,xvel,yvel);
 				Particle bullet = Main.ParticleList.get(particlenum);
 				Entity bulletEntity = Main.EntityMap.get(bullet);
-				bulletEntity.EntityDamageOnContact += shooterEntity.EntityWeapon.DamageBoost;
+				bulletEntity.EntityDamageOnContact += shooterEntity.Weapon.DamageBoost;
 			}
-			shooterEntity.EntityWeapon.CurrentReload = 0;
+			shooterEntity.Weapon.CurrentWeaponReload = 0;
 		}
 	}
 
 	public static void DamageEntity(Particle damaged, double damage)
 	{
 		Entity tobedamaged = Main.EntityMap.get(damaged);
-		if(tobedamaged.EntityShield != null && tobedamaged.EntityShield.Failed == false)
+		if(tobedamaged.Shield != null && tobedamaged.Shield.Failed == false)
 		{
-			tobedamaged.EntityShield.CurrentHitpoints -= damage;
-			tobedamaged.CurrentHealth -= tobedamaged.EntityShield.DamageMultiplier*damage;
+			tobedamaged.Shield.CurrentHitpoints -= damage;
+			tobedamaged.CurrentHealth -= tobedamaged.Shield.DamageMultiplier*damage;
 		}
 		else
 		{
@@ -426,10 +439,10 @@ public class UsefulParticleMethods
 			double radius = -100;
 			double[] xs = new double[] {Math.random()*1, -Math.random()*2};
 			double[] ys = new double[] {Math.random()*0, -Math.random()*0};
-			
+
 			//xs = new double[] {Math.random()*4, -Math.random()*4, Math.random()*4, -Math.random()*4};
 			//ys = new double[] {-Math.random()*4, Math.random()*4, Math.random()*4, -Math.random()*4};
-			
+
 			double[] magnitudes = GetMagnitudesForParticle(xs, ys);
 			double[] directions = GetDirectionsForParticle(xs,ys);
 			Color fillcolor = new Color(200,200,200,100);

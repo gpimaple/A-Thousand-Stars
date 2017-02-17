@@ -14,10 +14,11 @@ public class UsefulItemMethods {
 				"Glorbrox Nuclear Reactor", 
 				"An alien nuclear reactor barely held together with glue and caution tape.",
 				"shield",
+				10,
 				sprite
 				);
 		generator.InitializeGenerator(
-				10.0,                 //how many power points it generates each tick
+				1.0,                 //how many power points it generates each tick
 				400.0                 //max amount of power
 				);          
 		
@@ -31,6 +32,7 @@ public class UsefulItemMethods {
 				"ZetaCorp Defense Shield", 
 				"A standard shield produced by the massive Zetacorp corporation.",
 				"shield",
+				10,
 				sprite
 				);
 		shield.InitializeShield(
@@ -50,6 +52,7 @@ public class UsefulItemMethods {
 				"Standard Galactic Rocketry Basic Thruster", 
 				"An old fashioned basic thruster.",
 				"thruster",
+				10,
 				sprite
 				);
 		thruster.InitializeThruster(
@@ -66,6 +69,7 @@ public class UsefulItemMethods {
 				"ZetaCorp Asteroid Harvester", 
 				"An electricity powered weapon that is used to harvest asteroids.",
 				"weapon",
+				10,
 				sprite
 				);
 		weapon.InitializeWeapon(

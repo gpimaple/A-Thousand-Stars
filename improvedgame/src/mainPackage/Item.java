@@ -5,6 +5,7 @@ import java.awt.Image;
 public class Item {
 	public String Name = null;
 	public String Description = null;
+	public int Value;
 	public String Type = null;
 	public Image Sprite = null;
 	
@@ -87,10 +88,11 @@ public class Item {
 		WeaponRegeneration = regen;
 		PowerConsumptionWhenFired = powersump;
 	}
-	public Item(String name, String description, String type, Image sprite)
+	public Item(String name, String description, String type, int value, Image sprite)
 	{
 		Name = name;
 		Description = description;
+		Value = value;
 		Type = type;
 		Sprite = sprite;
 	}

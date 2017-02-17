@@ -240,41 +240,62 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				updated.Host.tobedestroyed = true;
 			}
 
-			if(updated.EntityShield != null)
+			if(updated.Shield != null)
 			{
-				updated.EntityShield.CurrentHitpoints += updated.EntityShield.Regeneration;
-
-
-				if(updated.EntityShield.CurrentHitpoints > updated.EntityShield.MaxHitpoints)
+				
+				if(updated.Shield.CurrentHitpoints < updated.Shield.MaxHitpoints &&
+						updated.Generator.CurrentPower >= updated.Shield.PowerConsumptionPerRegenTick)
 				{
-					updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
-				}
-
-				if(updated.EntityShield.CurrentHitpoints < 0)
-				{
-					updated.EntityShield.Failed = true;
-					updated.EntityShield.CurrentHitpoints = updated.EntityShield.MaxHitpoints;
-				}
-
-				if(updated.EntityShield.Failed == true)
-				{
-					updated.EntityShield.countdown--;
-					if(updated.EntityShield.countdown < 0)
+					updated.Shield.CurrentHitpoints += updated.Shield.RegenPerTick;
+					if(updated.Shield.CurrentHitpoints > updated.Shield.MaxHitpoints)
 					{
-						updated.EntityShield.Failed = false;
-						updated.EntityShield.countdown = updated.EntityShield.SetupTime;
+						updated.Shield.CurrentHitpoints = updated.Shield.MaxHitpoints;
+					}
+					updated.Generator.CurrentPower -= updated.Shield.PowerConsumptionPerRegenTick;
+				}
+
+				if(updated.Shield.CurrentHitpoints < 0)
+				{
+					updated.Shield.Failed = true;
+					updated.Shield.CurrentFix = 0;
+					updated.Shield.CurrentHitpoints = updated.Shield.MaxHitpoints;
+				}
+
+				if(updated.Shield.Failed == true)
+				{
+					updated.Shield.CurrentFix += 1;
+					if(updated.Shield.CurrentFix > updated.Shield.FixTime)
+					{
+						updated.Shield.Failed = false;
 					}
 				}
 			}
-			if(updated.EntityWeapon != null)
+			if(updated.Weapon != null)
 			{
-				updated.EntityWeapon.CurrentReload += updated.EntityWeapon.Regeneration;
-				if(updated.EntityWeapon.CurrentReload > updated.EntityWeapon.MaxReload)
+				if(updated.Weapon.CurrentWeaponReload < updated.Weapon.MaxWeaponReload)
 				{
-					updated.EntityWeapon.CurrentReload = updated.EntityWeapon.MaxReload;
+					updated.Weapon.CurrentWeaponReload += updated.Weapon.WeaponRegeneration;
+				}
+				
+				if(updated.Weapon.CurrentWeaponReload > updated.Weapon.MaxWeaponReload)
+				{
+					updated.Weapon.CurrentWeaponReload = updated.Weapon.MaxWeaponReload;
 				}
 			}
-
+			
+			if(updated.Generator != null)
+			{
+				if(updated.Generator.CurrentPower < updated.Generator.MaxPower)
+				{
+					updated.Generator.CurrentPower += updated.Generator.PowerGenerated;
+					if(updated.Generator.CurrentPower > updated.Generator.MaxPower)
+					{
+						updated.Generator.CurrentPower = updated.Generator.MaxPower;
+					}
+				}
+				System.out.println(updated.Generator.CurrentPower);
+			}
+			
 			if(updated.Type == "player")
 			{
 				if(leftkeydown == true)

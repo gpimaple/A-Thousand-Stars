@@ -199,8 +199,8 @@ public class UsefulSoundImageMethods{
 
 
 	}
-	
-	
+
+
 	//ALso handles inventory stuff
 	public static void DrawInventoryInGame(Graphics2D g2d)
 	{
@@ -211,13 +211,24 @@ public class UsefulSoundImageMethods{
 		g2d.setFont(new Font("Courier New", Font.BOLD, 20));
 		g2d.drawString("INVENTORY", 300, 50);
 		g2d.setPaint(Color.RED);
-		for(int i = 0; i < 10; i++)
-	    {
-			for(int a = 0; a < 10; a++)
-		    {	
-				g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
-		    }
-	    }
+		if(Main.PlayerIndex > -1)
+		{
+			Entity playerentity = Main.EntityMap.get(Main.ParticleList.get(Main.PlayerIndex));
+			for(int i = 0; i < 10; i++)
+			{
+				for(int a = 0; a < 10; a++)
+				{	
+					g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
+					
+					int index = a*10 + i;
+					if(playerentity.Inventory.length > index && playerentity.Inventory[index] != null)
+					{
+						Image sprite = playerentity.Inventory[index].Sprite;
+						g2d.drawImage(sprite, 110+(i)*50, 80+(a)*50, null);
+					}
+				}
+			}
+		}
 		if(Main.mouseclickedrecently == true)//if mouse has been clicked
 		{
 			if(IsButtonClicked(800, 20,80,20))
