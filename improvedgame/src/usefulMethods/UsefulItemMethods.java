@@ -75,7 +75,7 @@ public class UsefulItemMethods {
 				sprite
 				);
 		weapon.InitializeWeapon(
-				"electron torpedo",//type of particle/entity created
+				"Electron Torpedo",//type of particle/entity created
 				1.0,               //velocity
 				0.1,               //spread of bullets
 				5.0,               //damageboost

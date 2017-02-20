@@ -155,7 +155,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 	}
 
-	public static String currentScreen = "title";
+	public static String currentScreen = "inventory";
 	public static int screenCenteredX = 0;
 	public static int screenCenteredY = 0;
 
@@ -200,13 +200,13 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	{
 		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 30; i++)
+		for(int i = 0; i < 10; i++)
 		{
-			for(int q = 0; q < 30;q++)
+			for(int q = 0; q < 10;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(200+i*6.4, 200+q*6.4, 10);
+					UsefulParticleMethods.CreateAsteroid(200+i*.1, 200+q*.1, 1);
 				}
 			}
 		}
@@ -468,7 +468,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		{
 			UsefulSoundImageMethods.DrawParticles(g2d);
 			UsefulSoundImageMethods.DrawGameBar(g2d);
-			UsefulSoundImageMethods.DrawInventoryInGame(g2d);
+			UsefulSoundImageMethods.DrawInventory(g2d);
 		}
 		else if(currentScreen == "title")
 		{
@@ -483,9 +483,11 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static void main(String[] args)
 	{
 		JFrame frame = new JFrame("A Thousand Stars");
+		Image icon = Toolkit.getDefaultToolkit().getImage("Resources/Images/Icon.png");
+		frame.setIconImage(icon);
 		Main game = new Main(frame);
 		frame.add(game);
-		frame.setSize(1000, 700);
+		frame.setSize(1000, 730);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		game.initialize();

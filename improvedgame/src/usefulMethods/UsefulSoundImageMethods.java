@@ -202,9 +202,10 @@ public class UsefulSoundImageMethods{
 	}
 
 	public static int draggedindex = -1;
-	//ALso handles inventory stuff
-	public static void DrawInventoryInGame(Graphics2D g2d)
-	{
+	public static int selectedindex = -1;
+	//Also handles inventory stuff
+	public static void DrawInventory(Graphics2D g2d)
+	{                              
 		Color overlay = new Color(70,50,50, 100);
 		g2d.setPaint(overlay);
 		g2d.fillRect(0,0, 700, 700);
@@ -213,34 +214,101 @@ public class UsefulSoundImageMethods{
 		g2d.drawString("INVENTORY", 300, 50);
 		g2d.setPaint(Color.RED);
 		if(Main.PlayerIndex > -1)
-		{
+		{                     
 			Entity playerentity = Main.EntityMap.get(Main.ParticleList.get(Main.PlayerIndex));
 			int inventorysize = playerentity.Inventory.length;
 			for(int i = 0; i < 10; i++)
-			{
+			{          
 				for(int a = 0; a < 10; a++)
-				{	
+				{            
 					int index = a*10 + i;
+					int squarestartx = 70+(i)*50;
+					int squarestarty = 70+(a)*50;
+					
+					g2d.drawRect(squarestartx, squarestarty, 50,50);
+					
 					if(index < inventorysize)
-					{
-						g2d.drawRect(100+(i)*50, 70+(a)*50, 50,50);
+					{	
+					/*	int squarestartx = 70+(i)*50;
+						int squarestarty = 70+(a)*50;
+						
+						g2d.drawRect(squarestartx, squarestarty, 50,50);
+						*/
+						if(index == selectedindex)
+						{
+							g2d.setPaint(Color.GREEN);
+							g2d.drawRect(squarestartx+1,squarestarty+1, 48,48);
+							g2d.setPaint(Color.RED);
+						}
+						
 						if(playerentity.Inventory[index] != null//if there is something in the slot
 								&& draggedindex != index)//if the sprite is not being dragged
 						{
 							Image sprite = playerentity.Inventory[index].Sprite;
-							g2d.drawImage(sprite, 110+(i)*50, 80+(a)*50, null);
+							g2d.drawImage(sprite, squarestartx+10, squarestarty+10, null);
 						}
+						
+						
+						//handles selecting
+						if(Main.rightmousepressedrecently == true 
+								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))//if mouse has been clicked
+						{
+							selectedindex = index;
+						}
+						
+						if(index == selectedindex)
+						{
+							Item selecteditem = playerentity.Inventory[selectedindex];
+							g2d.setPaint(Main.ColorBlack);
+							g2d.fillRect(60, 580, 2000, 70);
+							g2d.setPaint(Color.GREEN);
+							g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
+							g2d.drawString("ITEM_NAME:"+selecteditem.Name, 70, 600);
+							g2d.drawString("DESCRIPTION:"+selecteditem.Description, 70, 620);
+							g2d.drawString("STATS:", 70, 640);
+							if(selecteditem.IsGenerator)
+							{
+								g2d.drawString("POWER_PER_TICK:" + (float)selecteditem.PowerGenerated,  120, 640);
+								g2d.drawString("MAX_POWER_HELD:" + (float)selecteditem.MaxPower, 260, 640);
+							}
+							else if(selecteditem.IsThruster)
+							{
+								g2d.drawString("ACCELERATION:" + (float)selecteditem.Acceleration,  120, 640);
+								g2d.drawString("POWER_CONSUMPTION:" + (float)selecteditem.PowerConsumptionPerThrust, 260, 640);
+							}
+							else if(selecteditem.IsShield)
+							{
+								g2d.drawString("DAMAGE_MULTIPLIER:" + (float)selecteditem.DamageMultiplier,  120, 640);
+								g2d.drawString("HITPOINTS:" + (float)selecteditem.MaxHitpoints,  280, 640);
+								g2d.drawString("FIX_TIME:" + (float)selecteditem.FixTime,  400, 640);
+								g2d.drawString("POWER_CONSUMPTION:" + (float)selecteditem.PowerConsumptionPerRegenTick,  520, 640);
+							}
+							else if(selecteditem.IsWeapon)
+							{
+								g2d.drawString("OBJECT_FIRED:" + selecteditem.EntityFired,  120, 640);
+								g2d.drawString("OBJECT_VELOCITY:" + (float)selecteditem.Velocity,  340, 640);
+								g2d.drawString("RELOAD:" + (float)Math.rint(selecteditem.MaxWeaponReload/selecteditem.WeaponRegeneration),  500, 640);
+								g2d.drawString("SPREAD:" + Math.rint(1000*selecteditem.Spread*(180/Math.PI))/1000 + "°",  590, 640);
+								g2d.drawString("BULLETS_FIRED:" + selecteditem.NumberFiredAtOnce,  680, 640);
+								g2d.drawString("POWER_CONSUMPTION:" +(float)selecteditem.PowerConsumptionWhenFired,  800, 640);
+							}
+							g2d.setPaint(Color.RED);
+						}
+						
+						
+						//handles switching
 						if(Main.leftmousepressedrecently == true 
-								&& IsButtonClicked(110+(i)*50, 80+(a)*50,32,32))//if mouse has been clicked
+								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))//if mouse has been clicked
 						{
 							draggedindex = index;
+							selectedindex = -1;
 						}
 						if(Main.leftmousereleasedrecently == true
-								&& IsButtonClicked(110+(i)*50, 80+(a)*50,32,32))
+								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))
 						{
 							Item item1 = playerentity.Inventory[draggedindex];
 							Item item2 = playerentity.Inventory[index];
-							
+
 							playerentity.Inventory[index] = item1;
 							playerentity.Inventory[draggedindex] = item2;
 							draggedindex = -1;
@@ -249,6 +317,7 @@ public class UsefulSoundImageMethods{
 					}
 				}
 			}
+
 			if(Main.leftmousedown == true
 					&& draggedindex != -1)
 			{
@@ -261,6 +330,7 @@ public class UsefulSoundImageMethods{
 			{
 				draggedindex = -1;
 			}
+			
 		}
 		if(Main.leftmousepressedrecently == true)//if mouse has been clicked
 		{

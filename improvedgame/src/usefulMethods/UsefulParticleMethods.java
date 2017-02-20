@@ -224,7 +224,7 @@ public class UsefulParticleMethods
 	*/	
 		
 		double direction = GetDirection(p2, p1);
-		double magnitude = 0.1;
+		double magnitude = 1;
 		p1.X += magnitude*Math.cos(direction);
 		p1.Y += magnitude*Math.sin(direction);
 
@@ -318,7 +318,7 @@ public class UsefulParticleMethods
 		String type = "asteroid";
 		String info = "A large rock that may contain valuable metals";
 		double damageoncontact = 1;
-		double health = mass*100;
+		double health = mass*500;
 		double regen = 0.001;
 		Item[] items = new Item[] {};
 		CreateEntity(host, type, info, items, health, regen, damageoncontact);
@@ -383,7 +383,7 @@ public class UsefulParticleMethods
 		String info = "A common missile used mainly to harvest asteroids, but can also be used to kill.";
 		double maxhealth = 10;
 		double healthregen = -0.03;
-		double damageoncontact = 10;
+		double damageoncontact = 100;
 		Item[] items = new Item[]{};
 		CreateEntity(host, type, info, items, maxhealth, healthregen, damageoncontact);
 		Main.EntityMap.get(host).EntityDamageSelfOnContact = 11;
