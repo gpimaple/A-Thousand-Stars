@@ -122,7 +122,7 @@ public class UsefulSoundImageMethods{
 					int imgheight = img.getHeight(null);
 					g2d.drawImage(img, (int)Math.rint(screenx- imgwidth/2), (int)Math.rint(screeny- imgheight/2), null);
 				}
-				/*
+				///*
 				g2d.setPaint(Color.white);
 				g2d.drawOval((int)(-displayed.Radius + screenx),
 						(int)(-displayed.Radius + screeny),
@@ -222,18 +222,13 @@ public class UsefulSoundImageMethods{
 				for(int a = 0; a < 10; a++)
 				{            
 					int index = a*10 + i;
-					int squarestartx = 70+(i)*50;
-					int squarestarty = 70+(a)*50;
-					
-					g2d.drawRect(squarestartx, squarestarty, 50,50);
-					
 					if(index < inventorysize)
 					{	
-					/*	int squarestartx = 70+(i)*50;
+						int squarestartx = 70+(i)*50;
 						int squarestarty = 70+(a)*50;
 						
 						g2d.drawRect(squarestartx, squarestarty, 50,50);
-						*/
+						
 						if(index == selectedindex)
 						{
 							g2d.setPaint(Color.GREEN);
@@ -256,14 +251,34 @@ public class UsefulSoundImageMethods{
 							selectedindex = index;
 						}
 						
-						if(index == selectedindex)
+						if(index == selectedindex &&  playerentity.Inventory[selectedindex] != null)
 						{
 							Item selecteditem = playerentity.Inventory[selectedindex];
 							g2d.setPaint(Main.ColorBlack);
 							g2d.fillRect(60, 580, 2000, 70);
 							g2d.setPaint(Color.GREEN);
 							g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
-							g2d.drawString("ITEM_NAME:"+selecteditem.Name, 70, 600);
+							g2d.drawString("NAME:"+selecteditem.Name, 70, 600);
+							g2d.drawString("TYPE:"+selecteditem.Type, 400, 600);
+							g2d.drawString("VALUE:"+selecteditem.Value, 530, 600);
+							if(selecteditem.IsGenerator || selecteditem.IsShield || selecteditem.IsThruster || selecteditem.IsWeapon)
+							{
+								g2d.setPaint(Color.WHITE);
+								g2d.fillRect(650, 590, 220, 20);
+								g2d.setPaint(Color.BLACK);
+								if(		selecteditem == playerentity.Generator || 
+										selecteditem == playerentity.Shield ||
+										selecteditem == playerentity.Thruster ||
+										selecteditem == playerentity.Weapon)
+								{
+									g2d.drawString("ALREADY_EQUIPPED_AS_" + selecteditem.Type, 660, 600);
+								}
+								else
+								{
+									g2d.drawString("EQUIP_AS_" + selecteditem.Type, 660, 600);
+								}								
+								g2d.setPaint(Color.GREEN);
+							}
 							g2d.drawString("DESCRIPTION:"+selecteditem.Description, 70, 620);
 							g2d.drawString("STATS:", 70, 640);
 							if(selecteditem.IsGenerator)
@@ -298,13 +313,14 @@ public class UsefulSoundImageMethods{
 						
 						//handles switching
 						if(Main.leftmousepressedrecently == true 
-								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))//if mouse has been clicked
+								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32)
+								&& playerentity.Inventory[index] != null)//if mouse has been clicked
 						{
 							draggedindex = index;
-							selectedindex = -1;
 						}
 						if(Main.leftmousereleasedrecently == true
-								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))
+								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32)
+								&& draggedindex != -1)
 						{
 							Item item1 = playerentity.Inventory[draggedindex];
 							Item item2 = playerentity.Inventory[index];
@@ -317,7 +333,28 @@ public class UsefulSoundImageMethods{
 					}
 				}
 			}
-
+			
+			if(selectedindex != -1 && IsButtonClicked(650, 590, 220, 20))
+			{
+				Item selecteditem = playerentity.Inventory[selectedindex]; 
+				if(selecteditem.IsGenerator)
+				{
+					playerentity.Generator = selecteditem;
+				}
+				if(selecteditem.IsThruster)
+				{
+					playerentity.Thruster = selecteditem;
+				}
+				if(selecteditem.IsShield)
+				{
+					playerentity.Shield = selecteditem;
+				}
+				if(selecteditem.IsWeapon)
+				{
+					playerentity.Weapon = selecteditem;
+				}
+			}
+			
 			if(Main.leftmousedown == true
 					&& draggedindex != -1)
 			{

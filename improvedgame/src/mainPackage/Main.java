@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import usefulMethods.Sector;
+import usefulMethods.UsefulAIMethods;
 import usefulMethods.UsefulParticleMethods;
 import usefulMethods.UsefulSoundImageMethods;
 import usefulMethods.UsefulWorldGenMethods;
@@ -29,6 +30,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.InvocationTargetException;
 
 
 
@@ -193,20 +195,20 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static Sector[][] SectorList = new Sector[MapSize][MapSize];
 	public static ArrayList<Particle> ParticleList  = new ArrayList<Particle>();
 	public static HashMap<Particle, Entity> EntityMap = new HashMap<Particle, Entity>();
-	public static HashMap<Entity, AI> AIMap = new HashMap<Entity, AI>();
+	public static HashMap<Entity, Object> AIMap = new HashMap<Entity, Object>();
 
 
 	void initialize()
 	{
 		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < 40; i++)
 		{
-			for(int q = 0; q < 10;q++)
+			for(int q = 0; q < 40;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(200+i*.1, 200+q*.1, 1);
+					UsefulParticleMethods.CreateAsteroid(200+i*.1, 200+q*.1, 10);
 				}
 			}
 		}
@@ -236,7 +238,8 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				for(int i = ParticleList.size()-1; i >= 0 ; i--)//run it backward
 				{
 					UpdateParticle(i);//updates the particles, location, velocity, 
-					UpdateEntity(i);//updates health
+					UpdateEntity(i);//updates health, and items
+					UpdateAI(i);
 				}
 				UsefulWorldGenMethods.ResetSectors();
 				UsefulParticleMethods.CheckCollision();		
@@ -249,7 +252,23 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	}
 
 
-
+	void UpdateAI(int i)
+	{
+		Particle particle = ParticleList.get(i);
+		Entity entity = EntityMap.get(particle);
+		Object obj = AIMap.get(entity);
+		if(entity != null && obj != null)
+		{
+			//updates
+			UsefulAIMethods.CallMethod(obj, "onTick", null);
+			if(leftmousepressedrecently || rightmousepressedrecently)
+			{
+				UsefulAIMethods.CallMethod(obj, "onClick", null);
+			}
+		}
+	}
+	
+	
 
 	void UpdateEntity(int i)
 	{
@@ -324,33 +343,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 				System.out.println(updated.Generator.CurrentPower);
 			}
 			
-			if(updated.Type == "player")
-			{
-				if(leftkeydown == true)
-				{
-					updated.Host.Rotation -= 0.03;
-					if(updated.Host.Rotation < -Math.PI)
-					{
-						updated.Host.Rotation += 2*Math.PI;
-					}
-				}
-				if(rightkeydown == true)
-				{
-					updated.Host.Rotation += 0.03;
-					if(updated.Host.Rotation > Math.PI)
-					{
-						updated.Host.Rotation -= 2*Math.PI;
-					}
-				}
-				if(upkeydown == true)
-				{
-					UsefulParticleMethods.MoveEntity(particle);
-				}
-				if(spacekeydown == true)
-				{
-					UsefulParticleMethods.ShootEntity(particle);
-				}
-			}
 
 
 		}

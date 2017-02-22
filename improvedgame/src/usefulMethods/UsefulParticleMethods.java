@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import javax.sound.sampled.AudioInputStream;
 
+import artificialIntelligence.Player;
 import mainPackage.*;
 
 public class UsefulParticleMethods 
@@ -190,15 +191,17 @@ public class UsefulParticleMethods
 		return newEntity;
 	}
 
+
+	
 	//collides two particles together elastically
 	public static void CollideParticles(Particle p1, Particle p2)
 	{	
 		Entity e1 = Main.EntityMap.get(p1);
 		Entity e2 = Main.EntityMap.get(p2);
-		UsefulParticleMethods.DamageEntity(p1,e2.EntityDamageOnContact);
-		UsefulParticleMethods.DamageEntity(p1,e1.EntityDamageSelfOnContact); //damage everybody
-		UsefulParticleMethods.DamageEntity(p2, e1.EntityDamageOnContact);
-		UsefulParticleMethods.DamageEntity(p2,e2.EntityDamageSelfOnContact);	
+		UsefulParticleMethods.DamageEntity(e1,e2.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(e1,e1.EntityDamageSelfOnContact); //damage everybody
+		UsefulParticleMethods.DamageEntity(e2, e1.EntityDamageOnContact);
+		UsefulParticleMethods.DamageEntity(e2,e2.EntityDamageSelfOnContact);	
 		double colAng = UsefulParticleMethods.GetDirection(p1, p2);
 		double mag1 = Math.sqrt(p1.Xvel*p1.Xvel+p1.Yvel*p1.Yvel);
 		double mag2 = Math.sqrt(p2.Xvel*p2.Xvel+p2.Yvel*p2.Yvel);
@@ -282,8 +285,10 @@ public class UsefulParticleMethods
 		Item shield = UsefulItemMethods.ZetaCorpDefenseShield();
 		Item thruster = UsefulItemMethods.StandardGalacticRocketryBasicThruster();
 		Item weapon = UsefulItemMethods.ZetaCorpAsteroidHarvester();
-		Item[] items = new Item[] {generator, shield, thruster, weapon};
+		Item[] items = new Item[] {generator, shield, thruster, weapon,null,null,null};
 		Entity player = CreateEntity(host, type, info, items, maxhealth, healthregen, damageoncontact);
+		Player ai = new Player(player);
+		Main.AIMap.put(player, ai);
 	}
 	//creates an asteroid. Asteroids are floating rocks not affected by gravity. They 
 	// can be damaged when a player shoots them and will eventually explode, producing metals.
@@ -320,13 +325,44 @@ public class UsefulParticleMethods
 		double damageoncontact = 1;
 		double health = mass*500;
 		double regen = 0.001;
-		Item[] items = new Item[] {};
+		Item[] items = new Item[] {UsefulItemMethods.Ore()};
 		CreateEntity(host, type, info, items, health, regen, damageoncontact);
-		return Main.ParticleList.size()-1;
+		return hostnumber;
 	}
 
-
-
+	public static int CreateItem(Item item)
+	{
+		double rotation = 0;
+		double radius = (item.Sprite.getHeight(null) + item.Sprite.getWidth(null))/4;
+		double[] magnitudes = new double[]{0};
+		double[] directions = new double[]{0};
+		Color fill = Color.WHITE;
+		Color outline = Color.WHITE;
+		
+		int hostnumber = 
+				CreateParticle(
+						0,//x
+						0,//y
+						rotation,
+						20,//mass
+						radius,
+						directions,
+						magnitudes,
+						fill,
+						outline
+						);
+		Particle host = Main.ParticleList.get(hostnumber);
+		String type = "item";
+		String info = item.Description;
+		double damageoncontact = 1;
+		double health = 500;
+		double regen = 0.001;
+		Item[] items = new Item[] {};
+		Entity entityhost = CreateEntity(host, type, info, items, health, regen, damageoncontact);
+		
+		return hostnumber;
+		
+	}
 
 
 	public static void AddVector(Particle particletoadd, double theta, double force)
@@ -335,17 +371,16 @@ public class UsefulParticleMethods
 		particletoadd.Yvel += (force*Math.sin(theta))/particletoadd.Mass;
 	}
 
-	public static void MoveEntity(Particle updated)
+	public static void MoveEntity(Entity updated)
 	{
-		Entity updatede = Main.EntityMap.get(updated);
-		if(updatede.Thruster != null)
+		if(updated.Thruster != null)
 		{
-			if(updatede.Generator != null
-					&& updatede.Generator.CurrentPower >= updatede.Thruster.PowerConsumptionPerThrust)
+			if(updated.Generator != null
+					&& updated.Generator.CurrentPower >= updated.Thruster.PowerConsumptionPerThrust)
 			{
-				double thrustforce = updatede.Thruster.Acceleration;
-				AddVector(updated, updated.Rotation,thrustforce);
-				updatede.Generator.CurrentPower -= updatede.Thruster.PowerConsumptionPerThrust;
+				double thrustforce = updated.Thruster.Acceleration;
+				AddVector(updated.Host, updated.Host.Rotation,thrustforce);
+				updated.Generator.CurrentPower -= updated.Thruster.PowerConsumptionPerThrust;
 			}
 		}
 	}
@@ -392,9 +427,8 @@ public class UsefulParticleMethods
 
 
 
-	public static void ShootEntity(Particle shooter)
+	public static void ShootEntity(Entity shooterEntity)
 	{
-		Entity shooterEntity = Main.EntityMap.get(shooter);
 		if(shooterEntity.Weapon != null 
 				&& shooterEntity.Weapon.CurrentWeaponReload >= shooterEntity.Weapon.MaxWeaponReload
 				&& shooterEntity.Generator.CurrentPower >= shooterEntity.Weapon.PowerConsumptionWhenFired)
@@ -402,13 +436,13 @@ public class UsefulParticleMethods
 			shooterEntity.Generator.CurrentPower -= shooterEntity.Weapon.PowerConsumptionWhenFired;
 			for(int q = 0; q < shooterEntity.Weapon.NumberFiredAtOnce; q++)
 			{
-				double rotation = shooter.Rotation + (Math.random()-0.5) * shooterEntity.Weapon.Spread;
-				double setback = shooter.Radius + 2;
-				double x = shooter.X + Math.cos(rotation)*setback*2;
-				double y = shooter.Y + Math.sin(rotation)*setback*2;
+				double rotation = shooterEntity.Host.Rotation + (Math.random()-0.5) * shooterEntity.Weapon.Spread;
+				double setback = shooterEntity.Host.Radius + 2;
+				double x = shooterEntity.Host.X + Math.cos(rotation)*setback*2;
+				double y = shooterEntity.Host.Y + Math.sin(rotation)*setback*2;
 				double velocity = shooterEntity.Weapon.Velocity;
-				double xvel = shooter.Xvel + Math.cos(rotation)*velocity;
-				double yvel = shooter.Yvel + Math.sin(rotation)*velocity;
+				double xvel = shooterEntity.Host.Xvel + Math.cos(rotation)*velocity;
+				double yvel = shooterEntity.Host.Yvel + Math.sin(rotation)*velocity;
 				// TODO differentiate for bullets
 				int particlenum = CreateElectronTorpedo(x,y,xvel,yvel);
 				Particle bullet = Main.ParticleList.get(particlenum);
@@ -419,9 +453,8 @@ public class UsefulParticleMethods
 		}
 	}
 
-	public static void DamageEntity(Particle damaged, double damage)
+	public static void DamageEntity(Entity tobedamaged, double damage)
 	{
-		Entity tobedamaged = Main.EntityMap.get(damaged);
 		if(tobedamaged.Shield != null && tobedamaged.Shield.Failed == false)
 		{
 			tobedamaged.Shield.CurrentHitpoints -= damage;

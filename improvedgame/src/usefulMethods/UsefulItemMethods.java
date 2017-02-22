@@ -15,7 +15,7 @@ public class UsefulItemMethods {
 		Item generator = new Item(
 				"Glorbrox Nuclear Reactor", 
 				"An alien nuclear reactor barely held together with glue and caution tape.",
-				"shield",
+				"GENERATOR",
 				10,
 				sprite
 				);
@@ -33,7 +33,7 @@ public class UsefulItemMethods {
 		Item shield = new Item(
 				"ZetaCorp Defense Shield", 
 				"A standard shield produced by the massive Zetacorp corporation.",
-				"shield",
+				"SHIELD",
 				10,
 				sprite
 				);
@@ -53,7 +53,7 @@ public class UsefulItemMethods {
 		Item thruster = new Item(
 				"Standard Galactic Rocketry Basic Thruster", 
 				"An old fashioned basic thruster.",
-				"thruster",
+				"THRUSTER",
 				10,
 				sprite
 				);
@@ -70,7 +70,7 @@ public class UsefulItemMethods {
 		Item weapon = new Item(
 				"ZetaCorp Asteroid Harvester", 
 				"An electricity powered weapon that is used to harvest asteroids.",
-				"weapon",
+				"WEAPON",
 				10,
 				sprite
 				);
@@ -85,5 +85,18 @@ public class UsefulItemMethods {
 				100                //power consumption per shot fired
 				);
 		return weapon;
+	}
+	
+	public static Item Ore()
+	{
+		Image sprite = Toolkit.getDefaultToolkit().getImage("Resources/Images/ItemSprite/Miscellaneous/Ore.png");
+		Item ore = new Item(
+				"Ore",
+				"A metal-bearing fragment of an asteroid that can be sold for money.",
+				"ORE",
+				5,
+				sprite
+				);
+		return ore;
 	}
 }
