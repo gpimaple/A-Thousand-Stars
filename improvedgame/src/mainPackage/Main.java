@@ -202,9 +202,9 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	{
 		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 40; i++)
+		for(int i = 0; i < 10; i++)
 		{
-			for(int q = 0; q < 40;q++)
+			for(int q = 0; q < 2;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
@@ -340,7 +340,6 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 						updated.Generator.CurrentPower = updated.Generator.MaxPower;
 					}
 				}
-				System.out.println(updated.Generator.CurrentPower);
 			}
 			
 

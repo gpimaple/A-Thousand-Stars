@@ -21,7 +21,7 @@ public class DroppedItem implements AI {
 		
 		double distance = UsefulParticleMethods.GetDistance(playerentity.Host, Host.Host);
 		
-		
+		System.out.println("hi");
 		if(distance < 200)
 		{
 			Item[] inventory = playerentity.Inventory;
@@ -46,6 +46,12 @@ public class DroppedItem implements AI {
 
 	@Override
 	public void onDamagedbyEntity(Entity damager) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeath() {
 		// TODO Auto-generated method stub
 		
 	}

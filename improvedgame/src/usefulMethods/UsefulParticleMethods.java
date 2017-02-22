@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import javax.sound.sampled.AudioInputStream;
 
+import artificialIntelligence.DroppedItem;
 import artificialIntelligence.Player;
 import mainPackage.*;
 
@@ -252,10 +253,25 @@ public class UsefulParticleMethods
 		//explodes
 		if(Main.EntityMap.get(Main.ParticleList.get(i)) != null)
 		{
+			Entity entity = Main.EntityMap.get(Main.ParticleList.get(i));
 			UsefulParticleMethods.Explode((int)(Main.ParticleList.get(i).Mass/2),
 					0.1,
 					Main.ParticleList.get(i).X, Main.ParticleList.get(i).Y,
 					Main.ParticleList.get(i).Xvel, Main.ParticleList.get(i).Yvel);
+			for(int q = 0; q < entity.Inventory.length; q++)
+			{
+				if(entity.Inventory[q] != null)
+				{
+					int itemint = CreateItem(entity.Inventory[q]);
+					Particle itemparticle = Main.ParticleList.get(itemint);
+					itemparticle.Xvel += (Math.random() -0.5)/2;
+					itemparticle.Yvel += (Math.random() -0.5)/2;
+					itemparticle.Xvel += entity.Host.Xvel;
+					itemparticle.Yvel += entity.Host.Yvel;
+					itemparticle.X = entity.Host.X;
+					itemparticle.Y = entity.Host.Y;
+				}
+			}
 		}
 		DestroyParticle(i);
 
@@ -265,7 +281,7 @@ public class UsefulParticleMethods
 	{
 		//x = x
 		//y = y
-		double rotation = 0;
+		double rotation = Math.PI*0.85;
 		double mass = 100;
 		double radius = 5;
 		double[] xs = new double[] {-5.0,10.0,-5.0};
@@ -323,9 +339,20 @@ public class UsefulParticleMethods
 		String type = "asteroid";
 		String info = "A large rock that may contain valuable metals";
 		double damageoncontact = 1;
-		double health = mass*500;
+		double health = mass*5;
 		double regen = 0.001;
-		Item[] items = new Item[] {UsefulItemMethods.Ore()};
+		Item[] items = new Item[] {null};
+		for(int i = 0; i < (int)mass; i++)
+		{
+			if(Math.random() > 0.99)
+			{
+				items = new Item[items.length +1];
+				for(int q = 0; q < items.length; q++)
+				{
+					items[q] = UsefulItemMethods.Ore();
+				}
+			}
+		}
 		CreateEntity(host, type, info, items, health, regen, damageoncontact);
 		return hostnumber;
 	}
@@ -333,7 +360,7 @@ public class UsefulParticleMethods
 	public static int CreateItem(Item item)
 	{
 		double rotation = 0;
-		double radius = (item.Sprite.getHeight(null) + item.Sprite.getWidth(null))/4;
+		double radius = 16;
 		double[] magnitudes = new double[]{0};
 		double[] directions = new double[]{0};
 		Color fill = Color.WHITE;
@@ -352,6 +379,7 @@ public class UsefulParticleMethods
 						outline
 						);
 		Particle host = Main.ParticleList.get(hostnumber);
+		host.Sprite = item.Sprite;
 		String type = "item";
 		String info = item.Description;
 		double damageoncontact = 1;
@@ -359,7 +387,8 @@ public class UsefulParticleMethods
 		double regen = 0.001;
 		Item[] items = new Item[] {};
 		Entity entityhost = CreateEntity(host, type, info, items, health, regen, damageoncontact);
-		
+		DroppedItem ai = new DroppedItem(item, entityhost);
+		Main.AIMap.put(entityhost, ai);
 		return hostnumber;
 		
 	}
@@ -418,7 +447,7 @@ public class UsefulParticleMethods
 		String info = "A common missile used mainly to harvest asteroids, but can also be used to kill.";
 		double maxhealth = 10;
 		double healthregen = -0.03;
-		double damageoncontact = 100;
+		double damageoncontact = 1000000;
 		Item[] items = new Item[]{};
 		CreateEntity(host, type, info, items, maxhealth, healthregen, damageoncontact);
 		Main.EntityMap.get(host).EntityDamageSelfOnContact = 11;

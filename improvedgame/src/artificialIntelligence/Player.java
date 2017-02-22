@@ -54,4 +54,11 @@ public class Player implements AI{
 		
 	}
 
+
+	@Override
+	public void onDeath() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

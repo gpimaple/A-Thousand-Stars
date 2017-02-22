@@ -9,6 +9,9 @@ public interface AI {
 	
 	public void onTick();
 	
+	public void onDeath();
+	
 	public void onDamagedbyEntity(Entity damager);
+	
 	
 }
