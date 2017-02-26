@@ -16,11 +16,11 @@ public class UsefulAIMethods {
 		try {
 			if(args != null)
 			{
-				subject.getClass().getMethod("onTick", args.getClass()).invoke(subject, args);
+				subject.getClass().getMethod(methodname, args.getClass()).invoke(subject, args);
 			}
 			else
 			{
-				subject.getClass().getMethod("onTick", null).invoke(subject, null);
+				subject.getClass().getMethod(methodname, null).invoke(subject, null);
 			}
 		} catch ( IllegalArgumentException |
 				 SecurityException | 

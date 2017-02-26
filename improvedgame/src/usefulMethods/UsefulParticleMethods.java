@@ -243,6 +243,7 @@ public class UsefulParticleMethods
 
 	public static void DestroyParticle(int i)
 	{
+		Main.AIMap.remove(Main.EntityMap.get(Main.ParticleList.get(i)));
 		Main.EntityMap.remove(Main.ParticleList.get(i));
 		Main.ParticleList.remove(i);
 
@@ -258,6 +259,11 @@ public class UsefulParticleMethods
 					0.1,
 					Main.ParticleList.get(i).X, Main.ParticleList.get(i).Y,
 					Main.ParticleList.get(i).Xvel, Main.ParticleList.get(i).Yvel);
+			if(Main.AIMap.get(entity) != null)
+			{
+				Object ai = Main.AIMap.get(entity);
+				UsefulAIMethods.CallMethod(ai, "onDeath", null);
+			}
 			for(int q = 0; q < entity.Inventory.length; q++)
 			{
 				if(entity.Inventory[q] != null)
@@ -341,10 +347,10 @@ public class UsefulParticleMethods
 		double damageoncontact = 1;
 		double health = mass*5;
 		double regen = 0.001;
-		Item[] items = new Item[] {null};
+		Item[] items = new Item[] {};
 		for(int i = 0; i < (int)mass; i++)
 		{
-			if(Math.random() > 0.99)
+			if(Math.random() > 0.999)
 			{
 				items = new Item[items.length +1];
 				for(int q = 0; q < items.length; q++)
@@ -382,7 +388,7 @@ public class UsefulParticleMethods
 		host.Sprite = item.Sprite;
 		String type = "item";
 		String info = item.Description;
-		double damageoncontact = 1;
+		double damageoncontact = 0;
 		double health = 500;
 		double regen = 0.001;
 		Item[] items = new Item[] {};

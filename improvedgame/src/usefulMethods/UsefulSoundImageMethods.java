@@ -2,6 +2,7 @@ package usefulMethods;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -14,6 +15,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.Spring;
 
 import mainPackage.Entity;
 import mainPackage.Item;
@@ -72,8 +74,9 @@ public class UsefulSoundImageMethods{
 	}
 
 
-	public static void DrawParticles(Graphics2D g2d)
+	public static void DrawParticles()
 	{
+		Graphics2D g2d = Main.g2d;
 		//renders icons
 		for(int i = 0; i < Main.ParticleList.size(); i++)
 		{
@@ -132,8 +135,9 @@ public class UsefulSoundImageMethods{
 		}
 	}
 
-	public static void DrawGameBar(Graphics2D g2d)
+	public static void DrawGameBar()
 	{
+		Graphics2D g2d = Main.g2d;
 		g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
 		g2d.setPaint(Color.GRAY);
 		g2d.fillRect(700, 0, 2000, 2000);
@@ -204,8 +208,9 @@ public class UsefulSoundImageMethods{
 	public static int draggedindex = -1;
 	public static int selectedindex = -1;
 	//Also handles inventory stuff
-	public static void DrawInventory(Graphics2D g2d)
+	public static void DrawInventory()
 	{                              
+		Graphics2D g2d = Main.g2d;
 		Color overlay = new Color(70,50,50, 100);
 		g2d.setPaint(overlay);
 		g2d.fillRect(0,0, 700, 700);
@@ -226,31 +231,31 @@ public class UsefulSoundImageMethods{
 					{	
 						int squarestartx = 70+(i)*50;
 						int squarestarty = 70+(a)*50;
-						
+
 						g2d.drawRect(squarestartx, squarestarty, 50,50);
-						
+
 						if(index == selectedindex)
 						{
 							g2d.setPaint(Color.GREEN);
 							g2d.drawRect(squarestartx+1,squarestarty+1, 48,48);
 							g2d.setPaint(Color.RED);
 						}
-						
+
 						if(playerentity.Inventory[index] != null//if there is something in the slot
 								&& draggedindex != index)//if the sprite is not being dragged
 						{
 							Image sprite = playerentity.Inventory[index].Sprite;
 							g2d.drawImage(sprite, squarestartx+10, squarestarty+10, null);
 						}
-						
-						
+
+
 						//handles selecting
 						if(Main.rightmousepressedrecently == true 
 								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32))//if mouse has been clicked
 						{
 							selectedindex = index;
 						}
-						
+
 						if(index == selectedindex &&  playerentity.Inventory[selectedindex] != null)
 						{
 							Item selecteditem = playerentity.Inventory[selectedindex];
@@ -309,8 +314,8 @@ public class UsefulSoundImageMethods{
 							}
 							g2d.setPaint(Color.RED);
 						}
-						
-						
+
+
 						//handles switching
 						if(Main.leftmousepressedrecently == true 
 								&& IsButtonClicked(squarestartx+10, squarestarty+10,32,32)
@@ -329,11 +334,11 @@ public class UsefulSoundImageMethods{
 							playerentity.Inventory[draggedindex] = item2;
 							draggedindex = -1;
 						}
-						
+
 					}
 				}
 			}
-			
+
 			if(selectedindex != -1 && IsButtonClicked(650, 590, 220, 20))
 			{
 				Item selecteditem = playerentity.Inventory[selectedindex]; 
@@ -354,7 +359,7 @@ public class UsefulSoundImageMethods{
 					playerentity.Weapon = selecteditem;
 				}
 			}
-			
+
 			if(Main.leftmousedown == true
 					&& draggedindex != -1)
 			{
@@ -367,7 +372,7 @@ public class UsefulSoundImageMethods{
 			{
 				draggedindex = -1;
 			}
-			
+
 		}
 		if(Main.leftmousepressedrecently == true)//if mouse has been clicked
 		{
@@ -380,8 +385,9 @@ public class UsefulSoundImageMethods{
 
 
 	public static Image titlebackground =  Toolkit.getDefaultToolkit().getImage("Resources/Images/TitleScreen.png");
-	public static void DrawTitleScreen(Graphics2D g2d)
+	public static void DrawTitleScreen()
 	{
+		Graphics2D g2d = Main.g2d;
 		g2d.drawImage(titlebackground, 0, 0, null );
 		g2d.setFont(new Font("Courier New", Font.PLAIN, 40));
 		g2d.setPaint(Color.white);
@@ -396,4 +402,76 @@ public class UsefulSoundImageMethods{
 		}
 		g2d.drawString("A Thousand Stars", 300, 300);
 	}
+
+	public static int DrawPopup(String Title, String[] Text, String[] Answers)
+	{
+		String PopupTitle = Title;
+		String[] PopupText = Text;
+		String[] PopupAnswers = Answers;
+		
+		Graphics2D g2d = (Graphics2D)Main.game.getGraphics();			
+		int PopupHeight = 20 + 12*PopupText.length + 20 +30*PopupAnswers.length;
+		int topheight = 350 - PopupHeight/2;
+		if(topheight < 50){ topheight = 50; }
+
+		g2d.setPaint(Main.ColorBlack); 
+
+		int titlesize = PopupTitle.length()*13+10;
+		g2d.fillRect(100, topheight -20, titlesize, 20);
+
+		g2d.fillRect(100, topheight, 500, PopupHeight);
+		g2d.setPaint(Color.GREEN);
+		g2d.drawRect(100+4, topheight+4, 500-8, PopupHeight-8);
+		g2d.setFont(new Font("Courier New", Font.BOLD, 20));
+		g2d.drawString(PopupTitle, 100+10, topheight-5);
+		g2d.setFont(new Font("Courier New", Font.PLAIN, 14));
+		int textstart = topheight + 20;
+		int textthickness = 0;
+		for(int i = 0; i < PopupText.length; i++)
+		{
+			g2d.drawString(PopupText[i], 100+10, textthickness+textstart);
+			textthickness += 12;
+		}
+
+		int answerstart = textstart + textthickness+20;
+		int answerthickness = 0;
+		for(int i = 0; i < PopupAnswers.length; i++)
+		{
+			g2d.setPaint(Color.WHITE);
+			int answerwidth = PopupAnswers[i].length() *8 + 6;
+			g2d.fillRect(100+10, answerstart + answerthickness, answerwidth, 20);
+			if(Main.leftmousepressedrecently  && IsButtonClicked(100+10, answerstart + answerthickness, answerwidth, 20))
+			{
+				return i;
+			}
+			g2d.setPaint(Main.ColorBlack);
+			g2d.drawString(PopupAnswers[i], 100+10+3, answerstart + answerthickness + 12);
+			answerthickness += 30;
+		}
+		
+		boolean visible = true;
+		while(visible)
+		{	
+			answerthickness = 0;
+			for(int i = 0; i < PopupAnswers.length; i++)
+			{
+				int answerwidth = PopupAnswers[i].length() *8 + 6;
+				if(Main.leftmousedown  && IsButtonClicked(100+10, answerstart + answerthickness, answerwidth, 20))
+				{
+					return i;
+				}
+				answerthickness += 30;
+			}
+			
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return -1;
+	}
 }
+

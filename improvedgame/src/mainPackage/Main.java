@@ -53,7 +53,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public void mouseExited(MouseEvent e) {}
 	@Override
 
-	public void mousePressed(MouseEvent e) 
+	synchronized public void mousePressed(MouseEvent e) 
 	{
 		
 		if(SwingUtilities.isRightMouseButton(e));
@@ -69,7 +69,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) 
+	synchronized public void mouseReleased(MouseEvent e) 
 	{
 		if(SwingUtilities.isRightMouseButton(e));
 		{
@@ -180,6 +180,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	public static boolean rightkeydown = false;
 
 	public static boolean gameActive = false;
+	public static boolean gameTempActive = true;
 	
 	public static final int MapSize = 30;
 	public static final int SectorSize = 64;
@@ -202,7 +203,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	{
 		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < 2; i++)
 		{
 			for(int q = 0; q < 2;q++)
 			{
@@ -231,7 +232,7 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		
 		//System.out.println((float)((double)gamemiliseconds/(double)miliseconds));
 		
-		if(gameActive == true)
+		if(gameActive == true && gameTempActive == true)
 		{
 			for(int a = 0; a < 10; a++)//10 steps
 			{
@@ -263,7 +264,15 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			UsefulAIMethods.CallMethod(obj, "onTick", null);
 			if(leftmousepressedrecently || rightmousepressedrecently)
 			{
-				UsefulAIMethods.CallMethod(obj, "onClick", null);
+				double screenx = particle.X - screenCenteredX +350;
+				double screeny = particle.Y - screenCenteredY +350;
+				double xdif = mousex - screenx; 
+				double ydif = mousey - screeny;
+				double distance = Math.sqrt(xdif*xdif + ydif*ydif);
+				if(distance <= particle.Radius)
+				{
+					UsefulAIMethods.CallMethod(obj, "onClick", null);
+				}
 			}
 		}
 	}
@@ -361,12 +370,12 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 			if(updated.X < 0)
 			{
 				updated.X = 0;
-				updated.Xvel = -updated.Xvel;
+				updated.Xvel = 0;//-updated.Xvel;
 			}
 			if(updated.Y < 0)
 			{
 				updated.Y = 0;
-				updated.Yvel = -updated.Yvel;
+				updated.Yvel = 0;//-updated.Yvel;
 			}
 			if(updated.X > SectorSize*MapSize)
 			{
@@ -438,11 +447,13 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 
 
 	public static Color ColorBlack = new Color(10,10,10,255); 
+	public static Graphics2D g2d;
 	@Override
 	public void paint(Graphics g) 
 	{
 		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
+		g2d = (Graphics2D) g;
+		
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setFont(new Font("Courier New", Font.PLAIN, 11));
@@ -452,31 +463,34 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 		
 		if(currentScreen == "game")
 		{
-			UsefulSoundImageMethods.DrawParticles(g2d);
-			UsefulSoundImageMethods.DrawGameBar(g2d);
+			UsefulSoundImageMethods.DrawParticles();
+			UsefulSoundImageMethods.DrawGameBar();
 		}
 		else if(currentScreen == "inventory")
 		{
-			UsefulSoundImageMethods.DrawParticles(g2d);
-			UsefulSoundImageMethods.DrawGameBar(g2d);
-			UsefulSoundImageMethods.DrawInventory(g2d);
+			UsefulSoundImageMethods.DrawParticles();
+			UsefulSoundImageMethods.DrawGameBar();
+			UsefulSoundImageMethods.DrawInventory();
 		}
 		else if(currentScreen == "title")
 		{
-			UsefulSoundImageMethods.DrawTitleScreen(g2d);
+			UsefulSoundImageMethods.DrawTitleScreen();
 		}
+		
+		
 		leftmousepressedrecently = false;
 		rightmousepressedrecently = false;
 		leftmousereleasedrecently = false;
 		rightmousereleasedrecently = false;
 	}
-
+	
+	public static Main game;
 	public static void main(String[] args)
 	{
 		JFrame frame = new JFrame("A Thousand Stars");
 		Image icon = Toolkit.getDefaultToolkit().getImage("Resources/Images/Icon.png");
 		frame.setIconImage(icon);
-		Main game = new Main(frame);
+		game = new Main(frame);
 		frame.add(game);
 		frame.setSize(1000, 730);
 		frame.setVisible(true);

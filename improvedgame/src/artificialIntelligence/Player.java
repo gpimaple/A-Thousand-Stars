@@ -16,7 +16,6 @@ public class Player implements AI{
 	@Override
 	public void onClick() {
 		
-		
 	}
 
 	@Override
