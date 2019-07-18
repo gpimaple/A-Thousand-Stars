@@ -203,13 +203,13 @@ public class Main extends JPanel implements KeyListener, MouseListener, MouseMot
 	{
 		UsefulParticleMethods.CreatePlayer(500,100);
 		///*
-		for(int i = 0; i < 2; i++)
+		for(int i = 0; i < 100; i++)
 		{
-			for(int q = 0; q < 2;q++)
+			for(int q = 0; q < 100;q++)
 			{
 				if( i%8 < 8 && q%8 < 8)
 				{
-					UsefulParticleMethods.CreateAsteroid(200+i*.1, 200+q*.1, 10);
+					UsefulParticleMethods.CreateAsteroid(200+i*10, 200+q*10, 10);
 				}
 			}
 		}
